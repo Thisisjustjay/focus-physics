@@ -84,17 +84,6 @@
           <button class="primary-button" id="checkButton" type="button" disabled>Check my thinking <span aria-hidden="true">→</span></button>
         </section>
 
-        <section class="stuck-section" aria-labelledby="stuckTitle">
-          <div>
-            <h3 id="stuckTitle">Feeling stuck?</h3>
-            <p>Tell us what kind of stuck. No penalty.</p>
-          </div>
-          <div class="stuck-actions">
-            <button type="button" data-help="words"><span>Aa</span>Simplify the words</button>
-            <button type="button" data-help="start"><span>↗</span>Help me start</button>
-            <button type="button" data-help="lost"><span>↺</span>I lost the thread</button>
-          </div>
-        </section>
       </section>
 
       <aside class="scratch-panel">
@@ -118,6 +107,29 @@
         </div>
       </aside>
     </main>
+
+    <aside class="help-dock" id="helpDock" aria-label="Learning help">
+      <div class="help-popover" id="helpPopover" role="dialog" aria-labelledby="helpTitle" hidden>
+        <div class="help-popover-header">
+          <div>
+            <p class="eyebrow">NO PENALTY. NO JUDGMENT.</p>
+            <h2 id="helpTitle">What kind of stuck?</h2>
+          </div>
+          <button class="help-close" id="helpClose" type="button" aria-label="Close help menu">×</button>
+        </div>
+        <p class="help-intro">Pick the closest match. Your next hint will adapt.</p>
+        <div class="help-options">
+          <button type="button" data-help="words"><span>Aa</span><div><strong>Simplify the words</strong><small>Make the question easier to parse</small></div></button>
+          <button type="button" data-help="start"><span>↗</span><div><strong>Help me start</strong><small>Give me one small first action</small></div></button>
+          <button type="button" data-help="lost"><span>↺</span><div><strong>I lost the thread</strong><small>Remind me what I already know</small></div></button>
+        </div>
+      </div>
+      <button class="help-launcher" id="helpLauncher" type="button" aria-expanded="false" aria-controls="helpPopover">
+        <span class="help-icon" aria-hidden="true">?</span>
+        <span class="help-launcher-copy"><strong>Need help?</strong><small>Choose the support you need</small></span>
+        <span class="help-chevron" aria-hidden="true">⌃</span>
+      </button>
+    </aside>
 
     <dialog id="pauseDialog">
       <button class="dialog-close" id="closeDialog" aria-label="Close pause dialog">×</button>

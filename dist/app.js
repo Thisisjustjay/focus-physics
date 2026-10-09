@@ -203,8 +203,40 @@ document.querySelectorAll("[data-help]").forEach(button => {
   button.addEventListener("click", () => {
     const message = steps[currentStep].help[button.dataset.help];
     showFeedback(message, "retry");
+    setHelpOpen(false);
     feedback.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
+});
+
+const helpDock = document.getElementById("helpDock");
+const helpLauncher = document.getElementById("helpLauncher");
+const helpPopover = document.getElementById("helpPopover");
+const helpClose = document.getElementById("helpClose");
+
+function setHelpOpen(open) {
+  helpPopover.hidden = !open;
+  helpLauncher.setAttribute("aria-expanded", String(open));
+  if (open) helpPopover.querySelector("[data-help]").focus();
+}
+
+helpLauncher.addEventListener("click", () => {
+  setHelpOpen(helpPopover.hidden);
+});
+
+helpClose.addEventListener("click", () => {
+  setHelpOpen(false);
+  helpLauncher.focus();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !helpPopover.hidden) {
+    setHelpOpen(false);
+    helpLauncher.focus();
+  }
+});
+
+document.addEventListener("click", event => {
+  if (!helpPopover.hidden && !helpDock.contains(event.target)) setHelpOpen(false);
 });
 
 scratchpad.value = localStorage.getItem("focusPhysicsNotes") || "";

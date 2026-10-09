@@ -101,7 +101,7 @@ button { color: inherit; }
   display: grid;
   grid-template-columns: 235px minmax(500px, 740px) 300px;
   gap: 28px;
-  padding: 34px 32px 44px;
+  padding: 34px 32px 130px;
 }
 
 .progress-panel, .scratch-panel { padding: 16px 4px; }
@@ -118,7 +118,7 @@ button { color: inherit; }
   line-height: 1.16;
 }
 .progress-panel h1 { font-size: 25px; }
-.lesson-meta, .microcopy, .scratch-prompt, .mission-context, .stuck-section p {
+.lesson-meta, .microcopy, .scratch-prompt, .mission-context {
   color: var(--muted);
 }
 .lesson-meta { margin: 10px 0 0; font-size: 13px; }
@@ -261,29 +261,105 @@ button { color: inherit; }
 .primary-button:disabled { cursor: not-allowed; color: #9da0a6; background: #e6e3dd; box-shadow: none; }
 .primary-button span { margin-left: 10px; }
 
-.stuck-section {
-  margin-top: 18px;
-  padding: 20px 22px;
+.help-dock {
+  position: fixed;
+  right: 26px;
+  bottom: 24px;
+  z-index: 30;
+  width: min(340px, calc(100vw - 32px));
+}
+
+.help-launcher {
+  width: 100%;
+  min-height: 68px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  border: 1px dashed #cbc4b7;
-  border-radius: 16px;
+  gap: 13px;
+  padding: 10px 14px 10px 11px;
+  border: 2px solid rgba(255,255,255,.55);
+  border-radius: 18px;
+  color: white;
+  background: var(--ink);
+  box-shadow: 0 16px 42px rgba(23,36,59,.28);
+  cursor: pointer;
+  text-align: left;
 }
-.stuck-section h3 { margin: 0; font: 800 15px "Manrope", sans-serif; }
-.stuck-section p { margin: 4px 0 0; font-size: 12px; }
-.stuck-actions { display: flex; gap: 8px; }
-.stuck-actions button {
-  padding: 9px 11px;
+.help-launcher:hover { background: #223454; transform: translateY(-1px); }
+.help-launcher:focus-visible { outline: 4px solid rgba(105,87,232,.32); outline-offset: 3px; }
+.help-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  color: var(--ink);
+  background: #ffd96b;
+  font: 800 24px/1 "Manrope", sans-serif;
+}
+.help-launcher-copy { display: grid; gap: 2px; flex: 1; }
+.help-launcher-copy strong { font: 800 16px/1.2 "Manrope", sans-serif; }
+.help-launcher-copy small { color: #cbd3e0; font-size: 11px; }
+.help-chevron { color: #ffd96b; font-size: 20px; transition: transform .18s ease; }
+.help-launcher[aria-expanded="true"] .help-chevron { transform: rotate(180deg); }
+
+.help-popover {
+  position: absolute;
+  right: 0;
+  bottom: 80px;
+  width: 100%;
+  padding: 21px;
+  border: 1px solid rgba(105,87,232,.24);
+  border-radius: 19px;
+  background: var(--panel);
+  box-shadow: 0 22px 65px rgba(23,36,59,.22);
+}
+.help-popover[hidden] { display: none; }
+.help-popover-header { display: flex; align-items: start; justify-content: space-between; gap: 14px; }
+.help-popover-header .eyebrow { margin-bottom: 5px; color: #9a6710; }
+.help-popover h2 { margin: 0; font: 800 20px/1.25 "Manrope", sans-serif; }
+.help-close {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: var(--muted);
+  background: #f0eee8;
+  cursor: pointer;
+  font-size: 20px;
+}
+.help-intro { margin: 8px 0 15px; color: var(--muted); font-size: 12px; }
+.help-options { display: grid; gap: 8px; }
+.help-options button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px;
   border: 1px solid #ddd7cc;
-  border-radius: 10px;
-  background: rgba(255,255,255,.65);
-  font-size: 11px;
-  font-weight: 700;
+  border-radius: 12px;
+  color: var(--ink);
+  background: white;
+  cursor: pointer;
+  text-align: left;
 }
-.stuck-actions button:hover { border-color: var(--purple); background: white; }
-.stuck-actions span { margin-right: 5px; color: var(--purple-dark); }
+.help-options button:hover { border-color: var(--purple); background: var(--purple-soft); }
+.help-options button > span {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  color: var(--purple-dark);
+  background: var(--purple-soft);
+  font-weight: 800;
+}
+.help-options button div { display: grid; gap: 2px; }
+.help-options button strong { font-size: 12px; }
+.help-options button small { color: var(--muted); font-size: 10px; }
 
 .scratch-panel {
   margin-top: 45px;
@@ -364,9 +440,10 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
   .problem-card { grid-template-columns: 1fr; }
   .force-diagram { max-width: 330px; margin: 0 auto; }
   .mission-card { padding: 28px 22px 24px; }
-  .stuck-section { align-items: stretch; flex-direction: column; }
-  .stuck-actions { display: grid; grid-template-columns: 1fr; }
   .scratch-panel { margin-top: 18px; }
+  .help-dock { right: 16px; bottom: 14px; width: calc(100vw - 32px); }
+  .help-launcher { min-height: 62px; }
+  .help-popover { bottom: 73px; max-height: calc(100vh - 110px); overflow-y: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
