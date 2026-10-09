@@ -5,8 +5,11 @@ const steps = [
     type: "choice",
     options: ["List the horizontal forces", "Divide 20 N by 5 kg", "Guess the acceleration direction"],
     correct: 0,
-    success: "Exactly. First make the forces visible; then the arithmetic has meaning.",
-    retry: "That move is tempting, but it skips friction. Start by listing every horizontal force.",
+    feedback: [
+      "Exactly. Listing 20 N right and 5 N left makes the opposing directions explicit before any arithmetic.",
+      "Dividing 20 N by 5 kg treats the push as the net force. Friction removes 5 N first, so identify and combine the forces before using F = ma.",
+      "Predicting the direction is a useful final sense-check, but it does not yet give the force magnitude. First list both horizontal forces so the direction follows from evidence, not a guess."
+    ],
     help: {
       words: "Two forces act in opposite directions. Before calculating, name them both.",
       start: "Write: push = 20 N right; friction = 5 N left.",
@@ -33,8 +36,11 @@ const steps = [
     type: "choice",
     options: ["Fnet = ma", "E = mc²", "p = mv"],
     correct: 0,
-    success: "Right. Newton’s second law turns the net force into acceleration.",
-    retry: "Look for the model containing force, mass, and acceleration together.",
+    feedback: [
+      "Right. Newton’s second law directly connects the known net force and mass to the unknown acceleration.",
+      "E = mc² connects mass and rest energy. It contains no force or acceleration, so it cannot model this crate’s change in motion.",
+      "p = mv defines momentum. Momentum could be useful if time or impulse were given, but here Fnet = ma connects the available quantities directly."
+    ],
     help: {
       words: "You need an equation connecting force, mass, and acceleration.",
       start: "Newton’s second law is the useful model here.",
@@ -61,8 +67,11 @@ const steps = [
     type: "choice",
     options: ["Yes — the larger force points right", "No — friction always stops motion", "No — acceleration must equal 20"],
     correct: 0,
-    success: "You completed the reasoning chain — setup, model, calculation, and sense-check.",
-    retry: "Compare the force arrows. The net force—and therefore acceleration—points toward the larger arrow.",
+    feedback: [
+      "Yes. The 20 N push is larger than the 5 N friction, so the 15 N net force—and the acceleration—must point right. Reasoning chain complete.",
+      "Friction opposes motion, but it does not automatically stop it. Here friction is only 5 N while the push is 20 N, leaving a net force to the right.",
+      "20 is a force measured in newtons, not an acceleration. Dividing the 15 N net force by 5 kg gives 3 m/s², with the units providing a useful error check."
+    ],
     help: {
       words: "Ask which direction the larger force points.",
       start: "Compare 20 N right with 5 N left.",
@@ -181,10 +190,12 @@ check.addEventListener("click", () => {
   const isCorrect = step.type === "choice" ? selected === step.correct : step.correct(selected);
   if (isCorrect) {
     passed = true;
-    showFeedback(step.success, "success");
+    const message = step.type === "choice" ? step.feedback[selected] : step.success;
+    showFeedback(message, "success");
     check.innerHTML = currentStep === steps.length - 1 ? "Start a fresh run <span aria-hidden=\"true\">↻</span>" : "Next small step <span aria-hidden=\"true\">→</span>";
   } else {
-    showFeedback(step.retry, "retry");
+    const message = step.type === "choice" ? step.feedback[selected] : step.retry;
+    showFeedback(message, "retry");
   }
 });
 
