@@ -12,9 +12,9 @@ const steps = [
     options: ["To the right", "To the left", "It will not accelerate"],
     correct: 0,
     feedback: [
-      "Good prediction. The 20 N push beats the 5 N friction, so the resultant force—and therefore the acceleration—points right.",
-      "A brave left turn, but friction is outnumbered. The 20 N push is larger than 5 N friction, so the resultant force points right.",
-      "The crate is not enjoying perfect balance: 20 N right and 5 N left do not cancel. A resultant force remains to the right."
+      "Big W. The 20 N push clears the 5 N friction, so the resultant force—and the acceleration—go right. Direction check passed.",
+      "Low-key not the move. Friction only has 5 N while the push has 20 N, so the bigger force makes the resultant point right.",
+      "Balanced forces? Not in this timeline. 20 N right and 5 N left leave 15 N to the right, so the crate accelerates."
     ],
     help: {
       words: "Compare the two opposite forces. Which one is larger?",
@@ -35,8 +35,8 @@ const steps = [
     placeholder: "Fnet = …",
     unit: "N",
     correct: value => Math.abs(Number(value) - 15) < 0.001,
-    success: "Exactly: 15 N to the right. In this tiny tug-of-war, the 20 N push beats 5 N friction by 15 N.",
-    retry: "Almost—friction is the party pooper here, pulling the opposite way. Use 20 N − 5 N, not 20 N + 5 N.",
+    success: "W calculation: 20 − 5 = 15 N right. Friction tried it, but the push still has 15 N left in the tank.",
+    retry: "The sign got caught in 4K. Friction points left, so it subtracts: 20 − 5 = 15 N right.",
     help: {
       words: "Net force means what remains after opposite forces cancel.",
       start: "Start with Fnet = 20 N − 5 N.",
@@ -56,9 +56,9 @@ const steps = [
     options: ["Fnet = ma", "E = mc²", "p = mv"],
     correct: 0,
     feedback: [
-      "Newton nods approvingly. Fnet = ma connects exactly our three characters: net force, mass, and acceleration.",
-      "E = mc² is famous, but it has wandered into the wrong classroom. It links mass and rest energy—not force and acceleration.",
-      "Momentum has arrived one lesson early. p = mv is useful with momentum or impulse; here Fnet = ma connects the quantities we actually have."
+      "W pick. Fnet = ma is literally the link between our net force, mass and acceleration. Newton would approve.",
+      "Iconic equation, wrong cinematic universe. E = mc² links mass and rest energy; it has no force or acceleration in it.",
+      "p = mv pulled up to the wrong function. It defines momentum; Fnet = ma is the equation that connects the quantities we have."
     ],
     help: {
       words: "You need an equation connecting force, mass, and acceleration.",
@@ -79,8 +79,8 @@ const steps = [
     placeholder: "a = …",
     unit: "m/s²",
     correct: value => Math.abs(Number(value) - 3) < 0.001,
-    success: "Correct: a = 15 ÷ 5 = 3 m/s² to the right. The crate officially has somewhere to be.",
-    retry: "Tiny algebra detour—no panic required. Rearrange F = ma so acceleration stands alone: a = F ÷ m, then calculate 15 ÷ 5.",
+    success: "You ate that calculation: a = 15 ÷ 5 = 3 m/s² to the right. Units, value and direction all understood the assignment.",
+    retry: "Small algebra plot twist. Get a by itself first: a = F ÷ m. Then 15 ÷ 5 gives 3 m/s².",
     help: {
       words: "Acceleration equals net force divided by mass.",
       start: "Calculate 15 ÷ 5.",
@@ -104,9 +104,9 @@ const steps = [
     ],
     correct: 0,
     feedback: [
-      "Three green lights: m/s² is the right unit, positive means right, and 15 ÷ 5 gives a sensible magnitude of 3. Physics detective case closed.",
-      "The units caught this one wearing a fake moustache: N measures force, not acceleration. The sign is also wrong because the resultant force points right.",
-      "Direction: good. Units: good. Magnitude: sneaky. Acceleration is force divided by mass, so 15 ÷ 5 gives 3 m/s²—not 15 m/s²."
+      "Full combo unlocked: m/s² is the right unit, positive means right, and 15 ÷ 5 gives a sensible magnitude of 3. Massive W.",
+      "Caught in 4K by the units: N measures force, not acceleration. The negative sign is also sus because the resultant force points right.",
+      "Units and direction passed the vibe check, but the magnitude did not. Acceleration is 15 ÷ 5 = 3 m/s²—not 15 m/s²."
     ],
     help: {
       words: "Look for one option with acceleration units, a rightward sign, and the value 3.",
