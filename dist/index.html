@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Focus Physics turns physics problem-solving into one calm, verifiable step at a time." />
+    <title>Focus Physics — One clear step at a time</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Focus Physics home">
+        <span class="brand-mark" aria-hidden="true">ƒ</span>
+        <span>Focus Physics</span>
+      </a>
+      <div class="header-actions">
+        <span class="calm-badge"><span class="status-dot"></span> Calm mode</span>
+        <button class="ghost-button" id="pauseButton" type="button">Pause &amp; save</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="progress-panel" aria-label="Lesson progress">
+        <div>
+          <p class="eyebrow">TODAY'S PRACTICE</p>
+          <h1>Forces in<br />one dimension</h1>
+          <p class="lesson-meta">Intro mechanics · 5 steps</p>
+        </div>
+
+        <div class="step-list" id="stepList" aria-label="Progress steps">
+          <div class="step-row active"><span>1</span><p>Set up the forces</p></div>
+          <div class="step-row"><span>2</span><p>Find net force</p></div>
+          <div class="step-row"><span>3</span><p>Choose the model</p></div>
+          <div class="step-row"><span>4</span><p>Calculate</p></div>
+          <div class="step-row"><span>5</span><p>Sense-check</p></div>
+        </div>
+
+        <div class="progress-note">
+          <span aria-hidden="true">◎</span>
+          <p><strong>No countdown.</strong><br />Take the time your brain needs.</p>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="workspace-topline">
+          <div>
+            <p class="eyebrow" id="stepEyebrow">STEP 1 OF 5</p>
+            <p class="microcopy">Only this step matters right now.</p>
+          </div>
+          <div class="progress-dots" id="progressDots" aria-label="Step 1 of 5">
+            <span class="filled"></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <article class="problem-card">
+          <div class="problem-copy">
+            <span class="problem-label">THE PROBLEM</span>
+            <p>A <strong>5 kg</strong> crate is pushed to the right with <strong>20 N</strong>. Friction pushes left with <strong>5 N</strong>. Find its acceleration.</p>
+          </div>
+          <svg class="force-diagram" viewBox="0 0 270 100" role="img" aria-label="A crate with a 20 newton arrow pointing right and a 5 newton friction arrow pointing left">
+            <defs>
+              <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6957e8" /></marker>
+              <marker id="arrow-coral" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e36f56" /></marker>
+            </defs>
+            <line x1="15" y1="81" x2="255" y2="81" stroke="#c9c3b7" stroke-width="2" />
+            <rect x="102" y="39" width="68" height="42" rx="7" fill="#243149" />
+            <text x="136" y="65" text-anchor="middle" fill="#fff" font-family="DM Sans" font-size="14" font-weight="700">5 kg</text>
+            <line x1="171" y1="50" x2="244" y2="50" stroke="#6957e8" stroke-width="4" marker-end="url(#arrow-purple)" />
+            <text x="208" y="36" text-anchor="middle" fill="#4e3fd0" font-family="DM Sans" font-size="12" font-weight="700">20 N push</text>
+            <line x1="101" y1="70" x2="39" y2="70" stroke="#e36f56" stroke-width="4" marker-end="url(#arrow-coral)" />
+            <text x="66" y="94" text-anchor="middle" fill="#ba4d37" font-family="DM Sans" font-size="12" font-weight="700">5 N friction</text>
+          </svg>
+        </article>
+
+        <section class="mission-card" id="missionCard" aria-live="polite">
+          <span class="mission-kicker">YOUR ONE MOVE</span>
+          <h2 id="missionTitle">Before calculating, what should you do first?</h2>
+          <p class="mission-context" id="missionContext">Choose one. You can change your mind.</p>
+          <div id="answerArea" class="answer-area"></div>
+          <div class="feedback" id="feedback" role="status" hidden></div>
+          <button class="primary-button" id="checkButton" type="button" disabled>Check my thinking <span aria-hidden="true">→</span></button>
+        </section>
+
+        <section class="stuck-section" aria-labelledby="stuckTitle">
+          <div>
+            <h3 id="stuckTitle">Feeling stuck?</h3>
+            <p>Tell us what kind of stuck. No penalty.</p>
+          </div>
+          <div class="stuck-actions">
+            <button type="button" data-help="words"><span>Aa</span>Simplify the words</button>
+            <button type="button" data-help="start"><span>↗</span>Help me start</button>
+            <button type="button" data-help="lost"><span>↺</span>I lost the thread</button>
+          </div>
+        </section>
+      </section>
+
+      <aside class="scratch-panel">
+        <div class="scratch-heading">
+          <div>
+            <p class="eyebrow">MY WORKSPACE</p>
+            <h2>Scratchpad</h2>
+          </div>
+          <span class="saved-state" id="savedState">Saved locally</span>
+        </div>
+        <p class="scratch-prompt">Your notes stay here between steps.</p>
+        <textarea id="scratchpad" aria-label="Scratchpad" placeholder="Try writing the forces you see…"></textarea>
+        <div class="formula-chips" aria-label="Insert a formula">
+          <button type="button" data-formula="Fnet = ">F<sub>net</sub></button>
+          <button type="button" data-formula="F = ma">F = ma</button>
+          <button type="button" data-formula="a = ">a =</button>
+        </div>
+        <div class="tip-card">
+          <span aria-hidden="true">✦</span>
+          <p><strong>Quiet hint</strong><br />Opposite directions need opposite signs.</p>
+        </div>
+      </aside>
+    </main>
+
+    <dialog id="pauseDialog">
+      <button class="dialog-close" id="closeDialog" aria-label="Close pause dialog">×</button>
+      <span class="pause-icon" aria-hidden="true">Ⅱ</span>
+      <p class="eyebrow">YOUR PLACE IS SAVED</p>
+      <h2>Good stopping point.</h2>
+      <p id="resumeSummary">When you return, your next move will be waiting here.</p>
+      <button class="primary-button" id="resumeButton" type="button">Resume this step</button>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
