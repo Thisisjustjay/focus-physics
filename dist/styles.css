@@ -277,18 +277,50 @@ button { color: inherit; }
   font-weight: 800;
 }
 .option.selected .option-key { color: white; background: var(--purple); }
-.text-answer {
+.number-input-wrap {
   width: 100%;
-  padding: 16px 18px;
+  display: flex;
+  align-items: center;
   border: 1.5px solid #d8d2c8;
   border-radius: 12px;
+  background: #fff;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.number-input-wrap:focus-within {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px var(--purple-soft);
+}
+.text-answer {
+  width: 100%;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 0;
   outline: none;
   color: var(--ink);
-  background: #fff;
+  background: transparent;
   font-size: 18px;
   font-weight: 700;
 }
-.text-answer:focus { border-color: var(--purple); box-shadow: 0 0 0 4px var(--purple-soft); }
+.text-answer::-webkit-outer-spin-button,
+.text-answer::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.text-answer[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.unit-suffix {
+  flex: 0 0 auto;
+  min-width: 68px;
+  margin: 10px 0;
+  padding: 6px 18px;
+  border-left: 1px solid #ddd8ed;
+  color: var(--purple);
+  font-size: 17px;
+  font-weight: 800;
+  text-align: center;
+}
 .feedback {
   margin-top: 16px;
   padding: 14px 16px;

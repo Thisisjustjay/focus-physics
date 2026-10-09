@@ -30,7 +30,8 @@ const steps = [
       phase: 1
     },
     type: "input",
-    placeholder: "Fnet = … N",
+    placeholder: "Fnet = …",
+    unit: "N",
     correct: value => Math.abs(Number(value) - 15) < 0.001,
     success: "Yes — 20 N − 5 N = 15 N to the right.",
     retry: "Check the directions. Friction opposes the push, so subtract rather than add.",
@@ -71,7 +72,8 @@ const steps = [
       phase: 3
     },
     type: "input",
-    placeholder: "a = … m/s²",
+    placeholder: "a = …",
+    unit: "m/s²",
     correct: value => Math.abs(Number(value) - 3) < 0.001,
     success: "Correct. a = 15 ÷ 5 = 3 m/s² to the right.",
     retry: "You have force and mass. Rearrange F = ma to a = F ÷ m.",
@@ -155,18 +157,27 @@ function renderStep() {
       area.appendChild(button);
     });
   } else {
+    const wrapper = document.createElement("div");
+    wrapper.className = "number-input-wrap";
+
     const input = document.createElement("input");
     input.type = "number";
     input.step = "any";
     input.className = "text-answer";
     input.placeholder = step.placeholder;
-    input.setAttribute("aria-label", step.placeholder);
+    input.setAttribute("aria-label", `${step.placeholder} ${step.unit}`);
     input.addEventListener("input", () => {
       selected = input.value;
       check.disabled = input.value.trim() === "";
       hideFeedback();
     });
-    area.appendChild(input);
+    const unit = document.createElement("span");
+    unit.className = "unit-suffix";
+    unit.textContent = step.unit;
+    unit.setAttribute("aria-hidden", "true");
+
+    wrapper.append(input, unit);
+    area.appendChild(wrapper);
     setTimeout(() => input.focus(), 0);
   }
 
