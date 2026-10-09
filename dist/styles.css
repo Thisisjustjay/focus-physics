@@ -198,6 +198,57 @@ button { color: inherit; }
   letter-spacing: -.025em;
 }
 .mission-context { margin: 0 0 24px; font-size: 14px; }
+.principle-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin: 0 0 22px;
+  padding: 15px 16px;
+  border: 1px solid #ead18e;
+  border-left: 4px solid #e1ac28;
+  border-radius: 12px;
+  background: #fff9e8;
+}
+.principle-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  color: #714d09;
+  background: #ffe49a;
+  font: 800 18px/1 Georgia, serif;
+}
+.principle-copy { min-width: 0; display: grid; gap: 3px; }
+.principle-copy > p {
+  margin: 0;
+  color: #8a610e;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.principle-copy > strong { font: 800 13px/1.35 "Manrope", sans-serif; }
+.principle-copy > span { color: #62583e; font-size: 12px; line-height: 1.48; }
+.thinking-sequence {
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.thinking-sequence span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #8b8170;
+  background: rgba(255,255,255,.7);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.thinking-sequence span.active { color: white; background: #9a6710; }
+.thinking-sequence i { color: #bfa96e; font-style: normal; font-size: 12px; }
 .answer-area { display: grid; gap: 10px; }
 .option {
   display: flex;

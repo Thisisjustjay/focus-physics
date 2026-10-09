@@ -2,6 +2,11 @@ const steps = [
   {
     title: "Before calculating, what should you do first?",
     context: "Choose one. You can change your mind.",
+    principle: {
+      title: "Free-body thinking",
+      text: "Identify every force and choose a positive direction before using an equation.",
+      phase: 0
+    },
     type: "choice",
     options: ["List the horizontal forces", "Divide 20 N by 5 kg", "Guess the acceleration direction"],
     correct: 0,
@@ -19,6 +24,11 @@ const steps = [
   {
     title: "What is the net horizontal force?",
     context: "Enter a number in newtons. Right is positive.",
+    principle: {
+      title: "Resultant force",
+      text: "Forces are vectors. Set right as positive, then combine forces using their directions—not just their sizes.",
+      phase: 1
+    },
     type: "input",
     placeholder: "Fnet = … N",
     correct: value => Math.abs(Number(value) - 15) < 0.001,
@@ -33,6 +43,11 @@ const steps = [
   {
     title: "Which model connects net force and acceleration?",
     context: "Pick the relationship that uses the crate’s mass.",
+    principle: {
+      title: "Newton’s second law",
+      text: "Acceleration depends on the resultant force and the object’s mass. Choose the model that connects all three.",
+      phase: 2
+    },
     type: "choice",
     options: ["Fnet = ma", "E = mc²", "p = mv"],
     correct: 0,
@@ -50,6 +65,11 @@ const steps = [
   {
     title: "Now find the acceleration.",
     context: "Enter a number in m/s². Your setup: 15 N = (5 kg)a.",
+    principle: {
+      title: "Rearrange before substituting",
+      text: "Isolate the unknown symbol first. Only then substitute values, keeping the units attached.",
+      phase: 3
+    },
     type: "input",
     placeholder: "a = … m/s²",
     correct: value => Math.abs(Number(value) - 3) < 0.001,
@@ -64,6 +84,11 @@ const steps = [
   {
     title: "Does 3 m/s² to the right make physical sense?",
     context: "Use the force diagram, not just the arithmetic.",
+    principle: {
+      title: "Check with physics",
+      text: "The acceleration direction must match the resultant force, and the units should reduce to m/s².",
+      phase: 4
+    },
     type: "choice",
     options: ["Yes — the larger force points right", "No — friction always stops motion", "No — acceleration must equal 20"],
     correct: 0,
@@ -92,6 +117,9 @@ const feedback = document.getElementById("feedback");
 const check = document.getElementById("checkButton");
 const stepEyebrow = document.getElementById("stepEyebrow");
 const progressDots = document.getElementById("progressDots");
+const principleTitle = document.getElementById("principleTitle");
+const principleText = document.getElementById("principleText");
+const thinkingPhases = [...document.querySelectorAll("#thinkingSequence span")];
 const scratchpad = document.getElementById("scratchpad");
 const savedState = document.getElementById("savedState");
 const pauseDialog = document.getElementById("pauseDialog");
@@ -102,6 +130,9 @@ function renderStep() {
   passed = false;
   title.textContent = step.title;
   context.textContent = step.context;
+  principleTitle.textContent = step.principle.title;
+  principleText.textContent = step.principle.text;
+  thinkingPhases.forEach((phase, index) => phase.classList.toggle("active", index === step.principle.phase));
   stepEyebrow.textContent = `STEP ${currentStep + 1} OF ${steps.length}`;
   feedback.hidden = true;
   feedback.className = "feedback";
