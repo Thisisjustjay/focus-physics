@@ -67,19 +67,6 @@ button { color: inherit; }
 }
 
 .header-actions { display: flex; align-items: center; gap: 12px; }
-.calm-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: #365b45;
-  background: var(--mint);
-  font-size: 13px;
-  font-weight: 700;
-}
-.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #45a36a; }
-
 .ghost-button, .primary-button, .stuck-actions button, .formula-chips button, .option {
   border: 0;
   cursor: pointer;
@@ -141,18 +128,32 @@ button { color: inherit; }
 .step-row.active { color: var(--ink); }
 .step-row.active span { color: white; border-color: var(--purple); background: var(--purple); }
 .step-row.done span { color: var(--green); border-color: #acd1b7; background: var(--mint); }
-.progress-note {
-  display: flex;
-  gap: 10px;
-  margin-top: 44px;
-  padding: 15px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.55);
-  font-size: 12px;
-  line-height: 1.5;
+.reasoning-trail {
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
 }
-.progress-note span { color: var(--purple); font-size: 18px; }
-.progress-note p { margin: 0; color: var(--muted); }
+.trail-heading { display: flex; align-items: center; gap: 8px; }
+.trail-heading > span { color: var(--purple); font-size: 18px; }
+.trail-heading h2 { margin: 0; font: 800 12px/1.3 "Manrope", sans-serif; }
+#reasoningTrail { margin-top: 12px; display: grid; gap: 9px; }
+.trail-empty { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.trail-item { display: flex; align-items: flex-start; gap: 8px; }
+.trail-item > span {
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--green);
+  background: var(--mint);
+  font-size: 10px;
+  font-weight: 800;
+}
+.trail-item div { min-width: 0; display: grid; gap: 1px; }
+.trail-item strong { font-size: 10px; }
+.trail-item small { color: var(--muted); font-size: 10px; line-height: 1.35; }
 
 .workspace { min-width: 0; }
 .workspace-topline { min-height: 45px; display: flex; align-items: flex-start; justify-content: space-between; }
@@ -179,7 +180,28 @@ button { color: inherit; }
   font-weight: 800;
   letter-spacing: .13em;
 }
-.problem-copy p { margin: 8px 0 0; font-size: 14px; line-height: 1.6; }
+.problem-facts { margin-top: 11px; display: grid; gap: 8px; }
+.fact-row { display: grid; grid-template-columns: 66px 1fr; align-items: baseline; gap: 9px; }
+.fact-row p { margin: 0; font-size: 13px; line-height: 1.45; }
+.command-word {
+  padding: 3px 6px;
+  border-radius: 6px;
+  color: #5644c7;
+  background: #eeeaff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-align: center;
+}
+.command-find { color: #7b5307; background: #ffe8a7; }
+.quantity {
+  padding: 1px 3px;
+  border-radius: 4px;
+  color: var(--ink);
+  background: #fff0ae;
+  font-weight: 800;
+}
+.unit { color: var(--purple-dark); font-weight: 800; }
 .force-diagram { width: 100%; max-height: 95px; }
 
 .mission-card {
@@ -495,19 +517,6 @@ button { color: inherit; }
   font: 700 11px Georgia, serif;
 }
 .formula-chips button:hover { border-color: var(--purple); }
-.tip-card {
-  margin-top: 22px;
-  padding: 14px;
-  display: flex;
-  gap: 10px;
-  border-radius: 12px;
-  background: var(--purple-soft);
-  font-size: 11px;
-  line-height: 1.5;
-}
-.tip-card span { color: var(--purple); font-size: 16px; }
-.tip-card p { margin: 0; color: #58536c; }
-
 dialog {
   max-width: 430px;
   padding: 38px;
@@ -531,11 +540,12 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
 
 @media (max-width: 780px) {
   .site-header { padding: 0 18px; }
-  .calm-badge { display: none; }
   .app-shell { display: block; padding: 22px 16px 40px; }
-  .progress-panel { display: flex; align-items: start; justify-content: space-between; gap: 15px; padding: 5px 2px 20px; }
+  .progress-panel { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 15px; padding: 5px 2px 20px; }
   .progress-panel h1 { font-size: 20px; }
-  .step-list, .progress-note { display: none; }
+  .step-list { display: none; }
+  .reasoning-trail { width: 100%; margin-top: 4px; padding: 13px 14px; border: 0; border-radius: 12px; background: rgba(255,255,255,.6); }
+  #reasoningTrail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspace-topline { margin-top: 4px; }
   .problem-card { grid-template-columns: 1fr; }
   .force-diagram { max-width: 330px; margin: 0 auto; }

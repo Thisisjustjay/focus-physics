@@ -17,7 +17,6 @@
         <span>Focus Physics</span>
       </a>
       <div class="header-actions">
-        <span class="calm-badge"><span class="status-dot"></span> Calm mode</span>
         <button class="ghost-button" id="pauseButton" type="button">Pause &amp; save</button>
       </div>
     </header>
@@ -38,10 +37,13 @@
           <div class="step-row"><span>5</span><p>Check units &amp; sense</p></div>
         </div>
 
-        <div class="progress-note">
-          <span aria-hidden="true">◎</span>
-          <p><strong>No countdown.</strong><br />Take the time your brain needs.</p>
-        </div>
+        <section class="reasoning-trail" aria-labelledby="trailTitle">
+          <div class="trail-heading">
+            <span aria-hidden="true">↳</span>
+            <h2 id="trailTitle">Reasoning so far</h2>
+          </div>
+          <div id="reasoningTrail" aria-live="polite"></div>
+        </section>
       </aside>
 
       <section class="workspace">
@@ -58,7 +60,11 @@
         <article class="problem-card">
           <div class="problem-copy">
             <span class="problem-label">THE PROBLEM</span>
-            <p>A <strong>5 kg</strong> crate is pushed to the right with <strong>20 N</strong>. Friction pushes left with <strong>5 N</strong>. Find its acceleration.</p>
+            <div class="problem-facts">
+              <div class="fact-row"><span class="command-word">GIVEN</span><p>mass = <strong class="quantity">5</strong> <span class="unit">kg</span></p></div>
+              <div class="fact-row"><span class="command-word">FORCES</span><p><strong class="quantity">20</strong> <span class="unit">N</span> right; <strong class="quantity">5</strong> <span class="unit">N</span> left</p></div>
+              <div class="fact-row"><span class="command-word command-find">FIND</span><p><strong>acceleration</strong></p></div>
+            </div>
           </div>
           <svg class="force-diagram" viewBox="0 0 270 100" role="img" aria-label="A crate with a 20 newton arrow pointing right and a 5 newton friction arrow pointing left">
             <defs>
@@ -76,7 +82,7 @@
         </article>
 
         <section class="mission-card" id="missionCard" aria-live="polite">
-          <span class="mission-kicker">YOUR ONE MOVE</span>
+          <span class="mission-kicker" id="missionCommand">PREDICT · YOUR ONE MOVE</span>
           <h2 id="missionTitle">Before calculating, what should you do first?</h2>
           <p class="mission-context" id="missionContext">Choose one. You can change your mind.</p>
           <div id="answerArea" class="answer-area"></div>
@@ -111,10 +117,6 @@
           <button type="button" data-formula="Fnet = ">F<sub>net</sub></button>
           <button type="button" data-formula="F = ma">F = ma</button>
           <button type="button" data-formula="a = ">a =</button>
-        </div>
-        <div class="tip-card">
-          <span aria-hidden="true">✦</span>
-          <p><strong>Quiet hint</strong><br />Opposite directions need opposite signs.</p>
         </div>
       </aside>
     </main>

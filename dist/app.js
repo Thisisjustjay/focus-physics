@@ -1,5 +1,6 @@
 const steps = [
   {
+    command: "PREDICT",
     title: "Before calculating, which way should the crate accelerate?",
     context: "Predict the direction first. No arithmetic yet.",
     principle: {
@@ -22,6 +23,7 @@ const steps = [
     }
   },
   {
+    command: "CALCULATE",
     title: "What is the net horizontal force?",
     context: "Enter a number in newtons. Right is positive.",
     principle: {
@@ -42,6 +44,7 @@ const steps = [
     }
   },
   {
+    command: "CHOOSE",
     title: "Which model connects net force and acceleration?",
     context: "Pick the relationship that uses the crate’s mass.",
     principle: {
@@ -64,6 +67,7 @@ const steps = [
     }
   },
   {
+    command: "CALCULATE",
     title: "Now find the acceleration.",
     context: "Enter a number in m/s². Your setup: 15 N = (5 kg)a.",
     principle: {
@@ -84,6 +88,7 @@ const steps = [
     }
   },
   {
+    command: "CHECK",
     title: "Final check: which statement passes all three tests?",
     context: "Check the units, sign and magnitude—not just the number.",
     principle: {
@@ -121,8 +126,10 @@ const context = document.getElementById("missionContext");
 const area = document.getElementById("answerArea");
 const feedback = document.getElementById("feedback");
 const check = document.getElementById("checkButton");
+const missionCommand = document.getElementById("missionCommand");
 const stepEyebrow = document.getElementById("stepEyebrow");
 const progressDots = document.getElementById("progressDots");
+const reasoningTrail = document.getElementById("reasoningTrail");
 const principleCard = document.getElementById("principleCard");
 const principleTitle = document.getElementById("principleTitle");
 const principleText = document.getElementById("principleText");
@@ -131,12 +138,21 @@ const scratchpad = document.getElementById("scratchpad");
 const savedState = document.getElementById("savedState");
 const pauseDialog = document.getElementById("pauseDialog");
 
+const trailItems = [
+  { label: "Prediction", value: "acceleration → right" },
+  { label: "Net force", value: "20 N − 5 N = 15 N right" },
+  { label: "Principle", value: "Fnet = ma" },
+  { label: "Acceleration", value: "15 N ÷ 5 kg = 3 m/s² right" },
+  { label: "Check", value: "units ✓  sign ✓  magnitude ✓" }
+];
+
 function renderStep() {
   const step = steps[currentStep];
   selected = null;
   passed = false;
   title.textContent = step.title;
   context.textContent = step.context;
+  missionCommand.textContent = `${step.command} · YOUR ONE MOVE`;
   principleTitle.textContent = step.principle.title;
   principleText.textContent = step.principle.text;
   thinkingPhases.forEach((phase, index) => phase.classList.toggle("active", index === step.principle.phase));
@@ -188,6 +204,7 @@ function renderStep() {
   }
 
   updateProgress();
+  updateReasoningTrail();
   localStorage.setItem("focusPhysicsStep", currentStep);
 }
 
@@ -207,11 +224,32 @@ function updateProgress() {
   });
 }
 
+function updateReasoningTrail() {
+  const completedCount = currentStep + (passed ? 1 : 0);
+  reasoningTrail.innerHTML = "";
+
+  if (completedCount === 0) {
+    const empty = document.createElement("p");
+    empty.className = "trail-empty";
+    empty.textContent = "Your verified steps will stay here.";
+    reasoningTrail.appendChild(empty);
+    return;
+  }
+
+  trailItems.slice(0, completedCount).forEach(item => {
+    const row = document.createElement("div");
+    row.className = "trail-item";
+    row.innerHTML = `<span aria-hidden="true">✓</span><div><strong>${item.label}</strong><small>${item.value}</small></div>`;
+    reasoningTrail.appendChild(row);
+  });
+}
+
 function hideFeedback() {
   feedback.hidden = true;
   feedback.className = "feedback";
   principleCard.hidden = true;
   passed = false;
+  updateReasoningTrail();
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
 }
 
@@ -240,6 +278,7 @@ check.addEventListener("click", () => {
   const isCorrect = step.type === "choice" ? selected === step.correct : step.correct(selected);
   if (isCorrect) {
     passed = true;
+    updateReasoningTrail();
     const message = step.type === "choice" ? step.feedback[selected] : step.success;
     showFeedback(message, "success");
     check.innerHTML = currentStep === steps.length - 1 ? "Start a fresh run <span aria-hidden=\"true\">↻</span>" : "Next small step <span aria-hidden=\"true\">→</span>";
@@ -313,8 +352,8 @@ document.querySelectorAll("[data-formula]").forEach(button => {
 
 document.getElementById("pauseButton").addEventListener("click", () => {
   const summary = [
-    "Start by naming the two horizontal forces.",
-    "You are combining the 20 N push and 5 N friction.",
+    "First predict the acceleration direction from the larger force.",
+    "Your prediction was right. Now combine 20 N right and 5 N left.",
     "You found the net force. Next, connect it to acceleration.",
     "You have Fnet = 15 N and m = 5 kg. Solve for a.",
     "Your calculation is complete. Check its direction against the diagram."
