@@ -11,9 +11,9 @@ const steps = [
     options: ["List the horizontal forces", "Divide 20 N by 5 kg", "Guess the acceleration direction"],
     correct: 0,
     feedback: [
-      "Exactly. Listing 20 N right and 5 N left makes the opposing directions explicit before any arithmetic.",
-      "Dividing 20 N by 5 kg treats the push as the net force. Friction removes 5 N first, so identify and combine the forces before using F = ma.",
-      "Predicting the direction is a useful final sense-check, but it does not yet give the force magnitude. First list both horizontal forces so the direction follows from evidence, not a guess."
+      "Nice. Physics before arithmetic—your calculator may feel ignored, but it’ll recover. Listing 20 N right and 5 N left makes both directions clear.",
+      "Your calculator has sprinted ahead without friction! The 20 N push is not the net force because 5 N acts the other way. Combine the forces first, then use F = ma.",
+      "Bold prediction—but physics likes receipts. List 20 N right and 5 N left first; then the acceleration direction follows from evidence, not guesswork."
     ],
     help: {
       words: "Two forces act in opposite directions. Before calculating, name them both.",
@@ -33,8 +33,8 @@ const steps = [
     placeholder: "Fnet = …",
     unit: "N",
     correct: value => Math.abs(Number(value) - 15) < 0.001,
-    success: "Yes — 20 N − 5 N = 15 N to the right.",
-    retry: "Check the directions. Friction opposes the push, so subtract rather than add.",
+    success: "Exactly: 15 N to the right. In this tiny tug-of-war, the 20 N push beats 5 N friction by 15 N.",
+    retry: "Almost—friction is the party pooper here, pulling the opposite way. Use 20 N − 5 N, not 20 N + 5 N.",
     help: {
       words: "Net force means what remains after opposite forces cancel.",
       start: "Start with Fnet = 20 N − 5 N.",
@@ -53,9 +53,9 @@ const steps = [
     options: ["Fnet = ma", "E = mc²", "p = mv"],
     correct: 0,
     feedback: [
-      "Right. Newton’s second law directly connects the known net force and mass to the unknown acceleration.",
-      "E = mc² connects mass and rest energy. It contains no force or acceleration, so it cannot model this crate’s change in motion.",
-      "p = mv defines momentum. Momentum could be useful if time or impulse were given, but here Fnet = ma connects the available quantities directly."
+      "Newton nods approvingly. Fnet = ma connects exactly our three characters: net force, mass, and acceleration.",
+      "E = mc² is famous, but it has wandered into the wrong classroom. It links mass and rest energy—not force and acceleration.",
+      "Momentum has arrived one lesson early. p = mv is useful with momentum or impulse; here Fnet = ma connects the quantities we actually have."
     ],
     help: {
       words: "You need an equation connecting force, mass, and acceleration.",
@@ -75,8 +75,8 @@ const steps = [
     placeholder: "a = …",
     unit: "m/s²",
     correct: value => Math.abs(Number(value) - 3) < 0.001,
-    success: "Correct. a = 15 ÷ 5 = 3 m/s² to the right.",
-    retry: "You have force and mass. Rearrange F = ma to a = F ÷ m.",
+    success: "Correct: a = 15 ÷ 5 = 3 m/s² to the right. The crate officially has somewhere to be.",
+    retry: "Tiny algebra detour—no panic required. Rearrange F = ma so acceleration stands alone: a = F ÷ m, then calculate 15 ÷ 5.",
     help: {
       words: "Acceleration equals net force divided by mass.",
       start: "Calculate 15 ÷ 5.",
@@ -95,9 +95,9 @@ const steps = [
     options: ["Yes — the larger force points right", "No — friction always stops motion", "No — acceleration must equal 20"],
     correct: 0,
     feedback: [
-      "Yes. The 20 N push is larger than the 5 N friction, so the 15 N net force—and the acceleration—must point right. Reasoning chain complete.",
-      "Friction opposes motion, but it does not automatically stop it. Here friction is only 5 N while the push is 20 N, leaving a net force to the right.",
-      "20 is a force measured in newtons, not an acceleration. Dividing the 15 N net force by 5 kg gives 3 m/s², with the units providing a useful error check."
+      "Case closed, physics detective. The 20 N push beats 5 N friction, so both the 15 N net force and the acceleration point right.",
+      "Friction is annoying, not a magical stop button. It provides only 5 N against a 20 N push, so 15 N still wins to the right.",
+      "The units have caught an impostor: 20 N is a force, not an acceleration. Divide 15 N by 5 kg to get 3 m/s²."
     ],
     help: {
       words: "Ask which direction the larger force points.",
