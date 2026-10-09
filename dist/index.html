@@ -31,11 +31,11 @@
         </div>
 
         <div class="step-list" id="stepList" aria-label="Progress steps">
-          <div class="step-row active"><span>1</span><p>Set up the forces</p></div>
+          <div class="step-row active"><span>1</span><p>Predict direction</p></div>
           <div class="step-row"><span>2</span><p>Find net force</p></div>
           <div class="step-row"><span>3</span><p>Choose the model</p></div>
           <div class="step-row"><span>4</span><p>Calculate</p></div>
-          <div class="step-row"><span>5</span><p>Sense-check</p></div>
+          <div class="step-row"><span>5</span><p>Check units &amp; sense</p></div>
         </div>
 
         <div class="progress-note">
@@ -79,19 +79,19 @@
           <span class="mission-kicker">YOUR ONE MOVE</span>
           <h2 id="missionTitle">Before calculating, what should you do first?</h2>
           <p class="mission-context" id="missionContext">Choose one. You can change your mind.</p>
-          <aside class="principle-card" aria-labelledby="principleLabel">
+          <div id="answerArea" class="answer-area"></div>
+          <div class="feedback" id="feedback" role="status" hidden></div>
+          <aside class="principle-card" id="principleCard" aria-labelledby="principleLabel" hidden>
             <span class="principle-icon" aria-hidden="true">∴</span>
             <div class="principle-copy">
               <p id="principleLabel">RELEVANT PRINCIPLE</p>
-              <strong id="principleTitle">Free-body thinking</strong>
-              <span id="principleText">Identify every force and choose a positive direction before using an equation.</span>
+              <strong id="principleTitle">Resultant force direction</strong>
+              <span id="principleText">An object accelerates in the direction of the resultant force.</span>
               <div class="thinking-sequence" id="thinkingSequence" aria-label="GCSE problem-solving sequence">
                 <span>Principle</span><i>›</i><span>Signs</span><i>›</i><span>Symbols</span><i>›</i><span>Numbers</span><i>›</i><span>Check</span>
               </div>
             </div>
           </aside>
-          <div id="answerArea" class="answer-area"></div>
-          <div class="feedback" id="feedback" role="status" hidden></div>
           <button class="primary-button" id="checkButton" type="button" disabled>Check my thinking <span aria-hidden="true">→</span></button>
         </section>
 

@@ -202,13 +202,14 @@ button { color: inherit; }
   display: flex;
   align-items: flex-start;
   gap: 13px;
-  margin: 0 0 22px;
+  margin: 10px 0 0;
   padding: 15px 16px;
   border: 1px solid #ead18e;
   border-left: 4px solid #e1ac28;
   border-radius: 12px;
   background: #fff9e8;
 }
+.principle-card[hidden] { display: none; }
 .principle-icon {
   width: 32px;
   height: 32px;

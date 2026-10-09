@@ -1,24 +1,24 @@
 const steps = [
   {
-    title: "Before calculating, what should you do first?",
-    context: "Choose one. You can change your mind.",
+    title: "Before calculating, which way should the crate accelerate?",
+    context: "Predict the direction first. No arithmetic yet.",
     principle: {
-      title: "Free-body thinking",
-      text: "Identify every force and choose a positive direction before using an equation.",
+      title: "Resultant force direction",
+      text: "An object accelerates in the direction of the resultant force. Compare opposing forces before calculating.",
       phase: 0
     },
     type: "choice",
-    options: ["List the horizontal forces", "Divide 20 N by 5 kg", "Guess the acceleration direction"],
+    options: ["To the right", "To the left", "It will not accelerate"],
     correct: 0,
     feedback: [
-      "Nice. Physics before arithmetic—your calculator may feel ignored, but it’ll recover. Listing 20 N right and 5 N left makes both directions clear.",
-      "Your calculator has sprinted ahead without friction! The 20 N push is not the net force because 5 N acts the other way. Combine the forces first, then use F = ma.",
-      "Bold prediction—but physics likes receipts. List 20 N right and 5 N left first; then the acceleration direction follows from evidence, not guesswork."
+      "Good prediction. The 20 N push beats the 5 N friction, so the resultant force—and therefore the acceleration—points right.",
+      "A brave left turn, but friction is outnumbered. The 20 N push is larger than 5 N friction, so the resultant force points right.",
+      "The crate is not enjoying perfect balance: 20 N right and 5 N left do not cancel. A resultant force remains to the right."
     ],
     help: {
-      words: "Two forces act in opposite directions. Before calculating, name them both.",
-      start: "Write: push = 20 N right; friction = 5 N left.",
-      lost: "We know the mass and two opposite forces. Your current job is only to identify those forces."
+      words: "Compare the two opposite forces. Which one is larger?",
+      start: "Point toward the larger force: 20 N right versus 5 N left.",
+      lost: "You are only predicting direction for now. The larger horizontal force points right."
     }
   },
   {
@@ -84,25 +84,29 @@ const steps = [
     }
   },
   {
-    title: "Does 3 m/s² to the right make physical sense?",
-    context: "Use the force diagram, not just the arithmetic.",
+    title: "Final check: which statement passes all three tests?",
+    context: "Check the units, sign and magnitude—not just the number.",
     principle: {
-      title: "Check with physics",
-      text: "The acceleration direction must match the resultant force, and the units should reduce to m/s².",
+      title: "Units, sign and magnitude",
+      text: "A complete physics check asks whether the units are correct, the sign matches the direction, and the size is reasonable.",
       phase: 4
     },
     type: "choice",
-    options: ["Yes — the larger force points right", "No — friction always stops motion", "No — acceleration must equal 20"],
+    options: [
+      "3 m/s²; positive/right; reasonable after 15 N ÷ 5 kg",
+      "3 N; negative/left; reasonable because friction acts left",
+      "15 m/s²; positive/right; reasonable because the net force is 15 N"
+    ],
     correct: 0,
     feedback: [
-      "Case closed, physics detective. The 20 N push beats 5 N friction, so both the 15 N net force and the acceleration point right.",
-      "Friction is annoying, not a magical stop button. It provides only 5 N against a 20 N push, so 15 N still wins to the right.",
-      "The units have caught an impostor: 20 N is a force, not an acceleration. Divide 15 N by 5 kg to get 3 m/s²."
+      "Three green lights: m/s² is the right unit, positive means right, and 15 ÷ 5 gives a sensible magnitude of 3. Physics detective case closed.",
+      "The units caught this one wearing a fake moustache: N measures force, not acceleration. The sign is also wrong because the resultant force points right.",
+      "Direction: good. Units: good. Magnitude: sneaky. Acceleration is force divided by mass, so 15 ÷ 5 gives 3 m/s²—not 15 m/s²."
     ],
     help: {
-      words: "Ask which direction the larger force points.",
-      start: "Compare 20 N right with 5 N left.",
-      lost: "Your calculation gave 3 m/s² right. The final check is whether that direction matches the 15 N net force."
+      words: "Look for one option with acceleration units, a rightward sign, and the value 3.",
+      start: "Check in this order: m/s², positive/right, then 15 ÷ 5 = 3.",
+      lost: "Your result was 3 m/s² to the right. Match its unit, direction and size."
     }
   }
 ];
@@ -119,6 +123,7 @@ const feedback = document.getElementById("feedback");
 const check = document.getElementById("checkButton");
 const stepEyebrow = document.getElementById("stepEyebrow");
 const progressDots = document.getElementById("progressDots");
+const principleCard = document.getElementById("principleCard");
 const principleTitle = document.getElementById("principleTitle");
 const principleText = document.getElementById("principleText");
 const thinkingPhases = [...document.querySelectorAll("#thinkingSequence span")];
@@ -138,6 +143,7 @@ function renderStep() {
   stepEyebrow.textContent = `STEP ${currentStep + 1} OF ${steps.length}`;
   feedback.hidden = true;
   feedback.className = "feedback";
+  principleCard.hidden = true;
   check.disabled = true;
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
   area.innerHTML = "";
@@ -204,6 +210,7 @@ function updateProgress() {
 function hideFeedback() {
   feedback.hidden = true;
   feedback.className = "feedback";
+  principleCard.hidden = true;
   passed = false;
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
 }
@@ -212,6 +219,7 @@ function showFeedback(message, kind) {
   feedback.textContent = message;
   feedback.className = `feedback ${kind}`;
   feedback.hidden = false;
+  principleCard.hidden = false;
 }
 
 check.addEventListener("click", () => {
