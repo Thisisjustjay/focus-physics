@@ -456,8 +456,7 @@ let understandingRequestId = 0;
 function showUnderstandingResponse(result, source) {
   const sections = [
     ["WHAT YOU’VE GOT", result.understood],
-    ["TIGHTEN THIS", result.clarify],
-    ["ONE QUESTION", result.nextQuestion]
+    ["TIGHTEN THIS", result.clarify]
   ];
   const content = sections.map(([label, copy]) => {
     const point = document.createElement("div");
@@ -510,8 +509,7 @@ understandingButton.addEventListener("click", async () => {
     if (requestId === understandingRequestId) {
       showUnderstandingResponse({
         understood: "You’re trying to connect force and motion, which is exactly the right conceptual territory.",
-        clarify: "Name the resultant force—not simply the biggest force—and state its direction before using Fnet = ma.",
-        nextQuestion: "What happens to the acceleration if the two horizontal forces are equal?"
+        clarify: "Name the resultant force—not simply the biggest force—and state its direction before using Fnet = ma."
       }, "Built-in backup · AI is temporarily unavailable");
     }
   } finally {

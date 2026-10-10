@@ -30,7 +30,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 选择 `Forces` 后会先进入双卡牌页面：
 
 1. `Take the 5-step test`：进入原有结构化测试。
-2. `Tell AI what you think`：无需进入新页面，直接输入对该 topic 的任意理解、半理解或疑问；AI 返回“已经理解的部分 / 需要澄清的部分 / 下一问”。
+2. `Tell AI what you think`：无需进入新页面，直接输入对该 topic 的任意理解、半理解或疑问；AI 返回“已经理解的部分 / 需要澄清的部分”。
 
 结构化测试本身仍为：预测方向 → 计算合力 → 选择 `Fnet = ma` → 计算加速度 → 检查 units、sign 和 magnitude。
 
@@ -67,7 +67,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 3. 后端验证字段与长度，设置 7 秒超时和轻量每-IP 限流。
 4. API 失败时自动退回本地 Mistake Detective 分类和 `steps[currentStep].ladder`，保证评委仍能看到完整体验。
 
-`/api/understanding` 只接收 `topic` 和用户在双卡牌页 textarea 中主动输入的 `thought`（最多 800 字符）。返回严格 JSON：`understood`、`clarify`、`nextQuestion`。前端会分三段展示；请求失败时明确显示内置 backup，不假装 AI 已成功响应。该功能不会读取 Scratchpad、测试答案、身份信息或诊断信息。
+`/api/understanding` 只接收 `topic` 和用户在双卡牌页 textarea 中主动输入的 `thought`（最多 800 字符）。返回严格 JSON：`understood`、`clarify`。前端会分两段展示；请求失败时明确显示内置 backup，不假装 AI 已成功响应。该功能不会读取 Scratchpad、测试答案、身份信息或诊断信息。
 
 开局页的其他 topic world 暂时只作未来方向展示。若来得及扩展，应优先增加一条完整的 Energy 或 Waves 路径；不要让 AI 即兴生成未经验证的物理答案。
 

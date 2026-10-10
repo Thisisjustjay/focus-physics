@@ -55,8 +55,7 @@ globalThis.fetch = async (url, options) => {
   const content = String(url).includes("/chat/completions") && "thought" in outboundState
     ? {
         understood: "You connected force with a change in motion.",
-        clarify: "Use resultant force, including direction, before applying Fnet = ma.",
-        nextQuestion: "What if the opposite forces are equal?"
+        clarify: "Use resultant force, including direction, before applying Fnet = ma."
       }
     : {
         mistakeType: outboundState.task === "detect" ? "direction_sign" : "principle",
@@ -109,7 +108,8 @@ try {
   );
   assert.equal(understandingResponse.status, 200);
   const understandingJson = await understandingResponse.json();
-  assert.equal(understandingJson.nextQuestion, "What if the opposite forces are equal?");
+  assert.equal(understandingJson.clarify, "Use resultant force, including direction, before applying Fnet = ma.");
+  assert.equal("nextQuestion" in understandingJson, false);
   assert.match(outboundState.thought, /larger force/);
 } finally {
   globalThis.fetch = originalFetch;

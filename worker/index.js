@@ -72,9 +72,8 @@ function parseUnderstandingJson(content) {
   const parsed = JSON.parse(cleaned.slice(start, end + 1));
   const understood = clip(parsed.understood, 320);
   const clarify = clip(parsed.clarify, 320);
-  const nextQuestion = clip(parsed.nextQuestion || parsed.next_question, 220);
-  if (!understood || !clarify || !nextQuestion) throw new Error("model response missed required fields");
-  return { understood, clarify, nextQuestion };
+  if (!understood || !clarify) throw new Error("model response missed required fields");
+  return { understood, clarify };
 }
 
 async function handleUnderstanding(request, env) {
@@ -97,9 +96,9 @@ async function handleUnderstanding(request, env) {
   };
   if (state.thought.length < 8) return json({ error: "Please share a little more about what you think." }, 400);
 
-  const systemPrompt = `You are Focus Physics, a calm GCSE Physics concept-check coach. The learner will share freeform thoughts about forces in one dimension. Identify one idea they understand, one precise correction or clarification, and one short Socratic next question. If the learner is accurate, use the clarification to add a useful nuance rather than inventing an error. Never diagnose or mention ADHD, grade intelligence, shame the learner, or infer a stable trait. Keep GCSE-level physics accurate, including resultant force, direction, sign conventions and units.
+  const systemPrompt = `You are Focus Physics, a calm GCSE Physics concept-check coach. The learner will share freeform thoughts about forces in one dimension. Identify one idea they understand and one precise correction or clarification. If the learner is accurate, use the clarification to add a useful nuance rather than inventing an error. Never diagnose or mention ADHD, grade intelligence, shame the learner, or infer a stable trait. Keep GCSE-level physics accurate, including resultant force, direction, sign conventions and units.
 
-Return only valid JSON with exactly these string keys: understood, clarify, nextQuestion. Keep understood under 45 words, clarify under 45 words, and nextQuestion under 25 words.`;
+Return only valid JSON with exactly these string keys: understood, clarify. Keep each value under 45 words.`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7_000);
