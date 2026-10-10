@@ -17,7 +17,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 - `site/index.html`：页面结构、题干、侧栏、帮助弹窗和暂停弹窗。
 - `site/styles.css`：全部视觉样式、响应式布局和动画降级设置。
-- `site/app.js`：5 步题目数据、答题逻辑、AI hint 调用、fallback、推理记录和本地保存。
+- `site/app.js`：5 步题目数据、答题逻辑、Mistake Detective、Adaptive Hint Ladder、fallback、推理记录和本地保存。
 - `worker/index.js`：页面资源路由与 `/api/hint` 服务端接口；调用 Groq，但不把密钥暴露给浏览器。
 - `scripts/build.mjs`：生成 `dist/server/index.js` Worker artifact。
 - `.openai/hosting.json`：Sites 项目标识与静态目录配置。不要更换其中的 `project_id`。
@@ -56,24 +56,24 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 ## 4. AI 提示接口
 
-`I’m stuck!` 的三个帮助选项会把当前题目步骤、当前答案和已验证的 reasoning trail 发送到 `/api/hint`。Scratchpad、姓名、邮箱和 ADHD 信息不会发送。
+答错后，Mistake Detective 会把当前题目步骤、当前答案、尝试次数和已验证的 reasoning trail 发送到 `/api/hint`，判断可观察到的错误类型，例如 direction/sign、units、calculation 或 equation choice。`I’m stuck!` 使用同一接口提供三级 Adaptive Hint Ladder：Nudge → Scaffold → Worked example。Scratchpad、姓名、邮箱和 ADHD 信息不会发送。
 
 建议只做一个可靠的核心能力：`misconception-aware hint`。
 
 1. Worker 从 secret `GROQ_API_KEY` 读取密钥，并使用 `AI_BASE_URL`、`AI_MODEL` 调用兼容 Chat Completions 的服务。
-2. 模型返回短 JSON：`hint`、`why`、`nextAction`。第一次提示不直接给最终答案；保持物理准确、非羞辱、每次只给一个动作。
+2. 模型返回短 JSON：`mistakeType`、`label`、`hint`、`why`、`nextAction`。前两级提示不计算目标答案；第三级只演示一组不同数字的平行例题。
 3. 后端验证字段与长度，设置 7 秒超时和轻量每-IP 限流。
-4. API 失败时自动退回现有静态 `steps[currentStep].help`，保证评委仍能完整操作。
+4. API 失败时自动退回本地 Mistake Detective 分类和 `steps[currentStep].ladder`，保证评委仍能看到完整体验。
 
 开局页的其他 topic world 暂时只作未来方向展示。若来得及扩展，应优先增加一条完整的 Energy 或 Waves 路径；不要让 AI 即兴生成未经验证的物理答案。
 
 ## 5. 代码入口提示
 
-- 题目内容和所有正确/错误文案位于 `dist/app.js` 顶部的 `steps` 数组。
+- 题目内容、正确/错误文案和三级 fallback 位于 `site/app.js` 顶部的 `steps` 数组。
 - 正确/错误判断位于 `check.addEventListener("click", ...)`。
 - 页面切换与状态重置位于 `renderStep()` 和 `hideFeedback()`。
 - `Reasoning so far` 由 `updateReasoningTrail()` 生成。
-- 开局页结构在 `dist/index.html` 的 `#topicGate`；显示/隐藏逻辑位于 `setTopicGate()`。
+- 开局页结构在 `site/index.html` 的 `#topicGate`；显示/隐藏逻辑位于 `setTopicGate()`。
 - 现有三栏布局位于 `.app-shell`；在 `1120px`、`780px` 和 `520px` 媒体查询中同步检查。
 
 ## 6. 本地运行与检查
@@ -82,7 +82,8 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 ```bash
 cd /Users/guomeixi/Documents/Codex/2026-10-07/ban/work/sites/focus-physics
-python3 -m http.server 4173 --directory dist
+node scripts/build.mjs
+node scripts/preview.mjs
 ```
 
 浏览器打开：`http://127.0.0.1:4173/`
@@ -102,6 +103,7 @@ git status --short
 
 - 5 个学习步骤全部可以继续前进并重新开始。
 - `I’m stuck!`、Scratchpad、Pause & save 和 Reasoning so far 没有被破坏。
+- 典型错误会显示 Mistake Detective；连续求助会显示 Hint 1/3、2/3、3/3，答错后第一次求助会自动提升到合适层级。
 - 桌面、窄屏和 `prefers-reduced-motion`。
 - 键盘可操作、焦点可见、反应文字可被屏幕阅读器读到。
 

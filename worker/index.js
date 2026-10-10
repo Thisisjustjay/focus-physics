@@ -54,11 +54,13 @@ function parseModelJson(content) {
   const end = cleaned.lastIndexOf("}");
   if (start < 0 || end <= start) throw new Error("model response was not JSON");
   const parsed = JSON.parse(cleaned.slice(start, end + 1));
+  const mistakeType = clip(parsed.mistakeType || parsed.mistake_type, 60);
+  const label = clip(parsed.label, 80);
   const hint = clip(parsed.hint, 280);
   const why = clip(parsed.why, 180);
   const nextAction = clip(parsed.nextAction || parsed.next_action, 180);
   if (!hint || !nextAction) throw new Error("model response missed required fields");
-  return { hint, why, nextAction };
+  return { mistakeType, label, hint, why, nextAction };
 }
 
 async function handleHint(request, env) {
@@ -76,6 +78,7 @@ async function handleHint(request, env) {
   }
 
   const state = {
+    task: incoming.task === "detect" ? "detect" : "hint",
     topic: clip(incoming.topic, 80),
     problem: clip(incoming.problem, 800),
     step: Number.isInteger(incoming.step) ? incoming.step : 0,
@@ -83,6 +86,7 @@ async function handleHint(request, env) {
     question: clip(incoming.question, 400),
     currentAnswer: clip(incoming.currentAnswer, 160),
     attempt: Math.max(0, Math.min(Number(incoming.attempt) || 0, 9)),
+    hintLevel: Math.max(1, Math.min(Number(incoming.hintLevel) || 1, 3)),
     helpType: ["words", "start", "lost"].includes(incoming.helpType) ? incoming.helpType : "start",
     reasoningSoFar: Array.isArray(incoming.reasoningSoFar)
       ? incoming.reasoningSoFar.slice(0, 5).map(item => clip(item, 160)).filter(Boolean)
@@ -91,7 +95,13 @@ async function handleHint(request, env) {
 
   if (!state.question || state.step < 1 || state.step > 5) return json({ error: "Missing lesson context." }, 400);
 
-  const systemPrompt = `You are Focus Physics, a calm GCSE Physics learning coach for pupils with attention variability. Diagnose the likely misconception from the supplied lesson state and give exactly one small next move. Be accurate, encouraging, concise, and age-appropriate. Never mention ADHD or diagnose the pupil. Never shame an incorrect answer. On attempts 0 or 1, do not reveal the final numerical answer. Preserve the stated sign convention and units. Return only valid JSON with exactly these string keys: hint, why, nextAction. Keep hint under 45 words, why under 30 words, and nextAction under 20 words.`;
+  const systemPrompt = `You are Focus Physics, a calm GCSE Physics learning coach for pupils with attention variability. Be accurate, encouraging, concise and age-appropriate. Never mention ADHD, diagnose the pupil, shame an answer, or infer a stable trait from one response. Preserve the stated sign convention and units. You may use at most one light, natural Gen Alpha phrase; clarity matters more than slang.
+
+The task is either "detect" or "hint".
+- For "detect": infer the single most likely observable error in the current answer. Choose mistakeType from reading, principle, direction_sign, units, calculation, equation_choice, or other. Give a friendly 2–4 word label, explain the specific mismatch without revealing the target final answer, and provide one repair action.
+- For "hint": obey hintLevel exactly. Level 1 (Nudge) reminds the relevant principle or direction only. Level 2 (Scaffold) provides the equation/setup and may substitute known values but does not calculate the target answer. Level 3 (Worked example) solves a short parallel example with different numbers, then asks the pupil to transfer the pattern; do not state the target problem's final answer.
+
+Return only valid JSON with exactly these string keys: mistakeType, label, hint, why, nextAction. Keep hint under 45 words, why under 30 words, label under 4 words, and nextAction under 20 words.`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7_000);
@@ -106,7 +116,7 @@ async function handleHint(request, env) {
       body: JSON.stringify({
         model: env.AI_MODEL || "qwen/qwen3.8-27b",
         temperature: 0.25,
-        max_completion_tokens: 220,
+        max_completion_tokens: 280,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },

@@ -402,6 +402,31 @@ button { color: inherit; }
 .feedback.retry { color: #87422f; background: #fff0e8; }
 .feedback.thinking { color: #5146a8; background: #f0edff; }
 .feedback.ai { color: #2f5361; background: #e9f4f4; border-left: 3px solid #6d9aa3; }
+.feedback.detective { color: #594c31; background: #f7f2e7; border-left: 3px solid #b49a62; }
+.feedback.diagnosing::after {
+  content: " · AI is checking the pattern…";
+  color: #7c6d51;
+  font-size: 12px;
+}
+.coach-feedback {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+}
+.coach-tag {
+  width: fit-content;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #595079;
+  background: rgba(255, 255, 255, .62);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.coach-title { font-size: 15px; }
+.coach-body, .coach-next { display: block; }
+.coach-next { font-weight: 800; }
+.coach-source { color: #77736a; font-size: 11px; }
 .primary-button {
   min-width: 190px;
   margin-top: 22px;

@@ -15,7 +15,12 @@ const steps = [
       words: "Compare the two opposite forces. Which one is larger?",
       start: "Point toward the larger force: 20 N right versus 5 N left.",
       lost: "You are only predicting direction for now. The larger horizontal force points right."
-    }
+    },
+    ladder: [
+      "Principle: acceleration follows the resultant force, so compare the opposing forces before doing arithmetic.",
+      "Scaffold: subtract the smaller opposing force from the larger one, then keep the larger force’s direction.",
+      "Parallel example: 12 N right against 4 N left leaves 8 N right. Apply that same comparison to 20 N and 5 N."
+    ]
   },
   {
     command: "CALCULATE",
@@ -31,7 +36,12 @@ const steps = [
       words: "Net force means what remains after opposite forces cancel.",
       start: "Start with Fnet = 20 N − 5 N.",
       lost: "You identified a 20 N force right and a 5 N force left. Combine only those two."
-    }
+    },
+    ladder: [
+      "Principle: resultant force is the vector sum. Forces in opposite directions subtract.",
+      "Scaffold: with right positive, write the force sum as +20 N + (−5 N). Do not calculate it yet.",
+      "Parallel example: 14 N right and 6 N left gives 14 − 6 = 8 N right. Now mirror that structure with 20 and 5."
+    ]
   },
   {
     command: "CHOOSE",
@@ -49,7 +59,12 @@ const steps = [
       words: "You need an equation connecting force, mass, and acceleration.",
       start: "Newton’s second law is the useful model here.",
       lost: "You found Fnet = 15 N. Now choose the equation that also contains the known mass, 5 kg."
-    }
+    },
+    ladder: [
+      "Principle: Newton’s second law connects resultant force, mass and acceleration.",
+      "Scaffold: choose the equation containing all three symbols: Fnet, m and a.",
+      "Worked connection: when force and mass are known, Fnet = ma can be rearranged to find acceleration. Match that to the choices."
+    ]
   },
   {
     command: "CALCULATE",
@@ -65,7 +80,12 @@ const steps = [
       words: "Acceleration equals net force divided by mass.",
       start: "Calculate 15 ÷ 5.",
       lost: "Your verified pieces are Fnet = 15 N and m = 5 kg. Use a = Fnet / m."
-    }
+    },
+    ladder: [
+      "Principle: rearrange Fnet = ma so acceleration is on its own: a = Fnet ÷ m.",
+      "Scaffold: substitute the verified values but pause before solving: a = 15 N ÷ 5 kg.",
+      "Parallel example: 12 N ÷ 3 kg = 4 m/s². Use the same division pattern with your 15 N and 5 kg."
+    ]
   },
   {
     command: "CHECK",
@@ -87,7 +107,12 @@ const steps = [
       words: "Look for one option with acceleration units, a rightward sign, and the value 3.",
       start: "Check in this order: m/s², positive/right, then 15 ÷ 5 = 3.",
       lost: "Your result was 3 m/s² to the right. Match its unit, direction and size."
-    }
+    },
+    ladder: [
+      "Principle: a physics answer needs the right unit, direction/sign and sensible magnitude.",
+      "Scaffold: scan each option three times—first for m/s², then right/positive, then the value from 15 ÷ 5.",
+      "Parallel check: 8 N ÷ 4 kg gives 2 m/s² in the net-force direction. Use the same unit–sign–magnitude check here."
+    ]
   }
 ];
 
@@ -96,6 +121,8 @@ if (currentStep < 0 || currentStep >= steps.length) currentStep = 0;
 let selected = null;
 let passed = false;
 let attemptCount = 0;
+let hintLevel = 0;
+let coachRequestId = 0;
 
 const title = document.getElementById("missionTitle");
 const context = document.getElementById("missionContext");
@@ -130,6 +157,8 @@ function renderStep() {
   selected = null;
   passed = false;
   attemptCount = 0;
+  hintLevel = 0;
+  coachRequestId += 1;
   title.textContent = step.title;
   context.textContent = step.context;
   missionCommand.textContent = `${step.command} · YOUR ONE MOVE`;
@@ -137,6 +166,7 @@ function renderStep() {
   feedback.hidden = true;
   feedback.className = "feedback";
   check.disabled = true;
+  document.querySelector(".help-launcher-copy small").textContent = "Tap for a hint";
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
   area.innerHTML = "";
 
@@ -221,8 +251,10 @@ function updateReasoningTrail() {
 }
 
 function hideFeedback() {
+  coachRequestId += 1;
   feedback.hidden = true;
   feedback.className = "feedback";
+  feedback.removeAttribute("aria-busy");
   passed = false;
   updateReasoningTrail();
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
@@ -232,6 +264,108 @@ function showFeedback(message, kind) {
   feedback.textContent = message;
   feedback.className = `feedback ${kind}`;
   feedback.hidden = false;
+}
+
+function showCoachFeedback({ tag, title: coachTitle, body, nextAction, source }, kind) {
+  const tagLine = document.createElement("span");
+  tagLine.className = "coach-tag";
+  tagLine.textContent = tag;
+
+  const heading = document.createElement("strong");
+  heading.className = "coach-title";
+  heading.textContent = coachTitle;
+
+  const explanation = document.createElement("span");
+  explanation.className = "coach-body";
+  explanation.textContent = body;
+
+  const next = document.createElement("span");
+  next.className = "coach-next";
+  next.textContent = `Try now: ${nextAction}`;
+
+  feedback.replaceChildren(tagLine, heading, explanation, next);
+  if (source) {
+    const sourceLabel = document.createElement("small");
+    sourceLabel.className = "coach-source";
+    sourceLabel.textContent = source;
+    feedback.appendChild(sourceLabel);
+  }
+  feedback.className = `feedback ${kind} coach-feedback`;
+  feedback.hidden = false;
+}
+
+function getCurrentAnswer(step) {
+  if (step.type === "choice" && Number.isInteger(selected)) return step.options[selected];
+  if (step.type === "input" && String(selected || "").trim()) return `${selected} ${step.unit}`;
+  return "No answer selected yet";
+}
+
+function fallbackMistakeLabel(step) {
+  if (currentStep === 0) return selected === 1 ? "Direction / sign" : "Resultant force";
+  if (currentStep === 1) {
+    const value = Number(selected);
+    if (Math.abs(value + 15) < 0.001) return "Direction / sign";
+    if (Math.abs(value - 25) < 0.001) return "Opposing forces";
+    return "Calculation";
+  }
+  if (currentStep === 2) return "Equation choice";
+  if (currentStep === 3) return Math.abs(Number(selected) - 75) < 0.001 ? "Rearranging" : "Calculation";
+  if (currentStep === 4) return selected === 1 ? "Units / sign" : "Magnitude";
+  return step.command.toLowerCase();
+}
+
+function coachPayload(step, task, extra = {}) {
+  return {
+    task,
+    topic: "Forces in one dimension",
+    problem: "A 5 kg crate has a 20 N force right and 5 N friction left. Find its acceleration. Right is positive.",
+    step: currentStep + 1,
+    command: step.command,
+    question: step.title,
+    currentAnswer: getCurrentAnswer(step),
+    attempt: attemptCount,
+    hintLevel,
+    reasoningSoFar: trailItems.slice(0, currentStep).map(item => `${item.label}: ${item.value}`),
+    ...extra
+  };
+}
+
+async function diagnoseMistake(step, fallbackMessage) {
+  const requestId = ++coachRequestId;
+  const stepAtRequest = currentStep;
+  feedback.classList.add("diagnosing");
+  feedback.setAttribute("aria-busy", "true");
+
+  try {
+    const response = await fetch("/api/hint", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(coachPayload(step, "detect"))
+    });
+    if (!response.ok) throw new Error("AI diagnosis unavailable");
+    const data = await response.json();
+    if (requestId !== coachRequestId || stepAtRequest !== currentStep) return;
+    const body = [data.hint, data.why].filter(Boolean).join(" ");
+    showCoachFeedback({
+      tag: "MISTAKE DETECTIVE",
+      title: `Likely snag: ${data.label || fallbackMistakeLabel(step)}`,
+      body: body || fallbackMessage,
+      nextAction: data.nextAction || step.help.start,
+      source: "AI spotted the pattern in this attempt"
+    }, "detective");
+  } catch {
+    if (requestId === coachRequestId && stepAtRequest === currentStep) {
+      showCoachFeedback({
+        tag: "MISTAKE DETECTIVE",
+        title: `Likely snag: ${fallbackMistakeLabel(step)}`,
+        body: fallbackMessage,
+        nextAction: step.help.start,
+        source: "Built-in backup diagnosis"
+      }, "detective");
+    }
+  } finally {
+    if (requestId === coachRequestId) feedback.removeAttribute("aria-busy");
+  }
 }
 
 function setTopicGate(open) {
@@ -307,46 +441,53 @@ check.addEventListener("click", () => {
     attemptCount += 1;
     const message = step.type === "choice" ? step.feedback[selected] : step.retry;
     showFeedback(message, "retry");
+    void diagnoseMistake(step, message);
   }
 });
 
 document.querySelectorAll("[data-help]").forEach(button => {
   button.addEventListener("click", async () => {
     const step = steps[currentStep];
-    const fallback = step.help[button.dataset.help];
+    hintLevel = Math.min(3, Math.max(hintLevel + 1, Math.min(3, attemptCount + 1)));
+    const fallback = hintLevel === 1 ? step.help[button.dataset.help] : step.ladder[hintLevel - 1];
+    const levelNames = ["Nudge", "Scaffold", "Worked example"];
+    const levelName = levelNames[hintLevel - 1];
+    const requestId = ++coachRequestId;
+    const stepAtRequest = currentStep;
     setHelpOpen(false);
-    showFeedback("Thinking about one useful next move…", "thinking");
+    showFeedback(`Building hint ${hintLevel} of 3: ${levelName}…`, "thinking");
     feedback.setAttribute("aria-busy", "true");
     feedback.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-    let currentAnswer = "No answer selected yet";
-    if (step.type === "choice" && Number.isInteger(selected)) currentAnswer = step.options[selected];
-    if (step.type === "input" && String(selected || "").trim()) currentAnswer = `${selected} ${step.unit}`;
+    document.querySelector(".help-launcher-copy small").textContent = hintLevel < 3 ? `Hint ${hintLevel} of 3 used` : "Full scaffold ready";
 
     try {
       const response = await fetch("/api/hint", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          topic: "Forces in one dimension",
-          problem: "A 5 kg crate has a 20 N force right and 5 N friction left. Find its acceleration. Right is positive.",
-          step: currentStep + 1,
-          command: step.command,
-          question: step.title,
-          currentAnswer,
-          attempt: attemptCount,
-          helpType: button.dataset.help,
-          reasoningSoFar: trailItems.slice(0, currentStep).map(item => `${item.label}: ${item.value}`)
-        })
+        body: JSON.stringify(coachPayload(step, "hint", { helpType: button.dataset.help }))
       });
       if (!response.ok) throw new Error("AI hint unavailable");
       const data = await response.json();
-      const why = data.why ? ` ${data.why}` : "";
-      showFeedback(`AI coach: ${data.hint}${why} Next move: ${data.nextAction}`, "ai");
+      if (requestId !== coachRequestId || stepAtRequest !== currentStep) return;
+      showCoachFeedback({
+        tag: `HINT ${hintLevel} OF 3`,
+        title: levelName,
+        body: [data.hint, data.why].filter(Boolean).join(" "),
+        nextAction: data.nextAction,
+        source: "AI adapted this hint to your current attempt"
+      }, "ai");
     } catch {
-      showFeedback(`${fallback} Static fallback used—your lesson still works.`, "retry");
+      if (requestId === coachRequestId && stepAtRequest === currentStep) {
+        showCoachFeedback({
+          tag: `HINT ${hintLevel} OF 3`,
+          title: levelName,
+          body: fallback,
+          nextAction: hintLevel < 3 ? "Try this step, or ask again for more support." : "Copy the pattern using this problem’s values.",
+          source: "Built-in backup hint"
+        }, "ai");
+      }
     } finally {
-      feedback.removeAttribute("aria-busy");
+      if (requestId === coachRequestId) feedback.removeAttribute("aria-busy");
     }
   });
 });

@@ -26,4 +26,57 @@ const hintResponse = await workerModule.default.fetch(
   {}
 );
 assert.equal(hintResponse.status, 503, "Missing secret should fail safely");
-console.log("Artifact serves the lesson and fails safely without a local API secret");
+
+const appResponse = await workerModule.default.fetch(new Request("https://example.test/app.js"), {}, {});
+const appSource = await appResponse.text();
+assert.match(appSource, /MISTAKE DETECTIVE/);
+assert.match(appSource, /Worked example/);
+
+const originalFetch = globalThis.fetch;
+let outboundState;
+globalThis.fetch = async (_url, options) => {
+  const outbound = JSON.parse(options.body);
+  outboundState = JSON.parse(outbound.messages[1].content);
+  return new Response(JSON.stringify({
+    choices: [{ message: { content: JSON.stringify({
+      mistakeType: outboundState.task === "detect" ? "direction_sign" : "principle",
+      label: outboundState.task === "detect" ? "Direction / sign" : "Worked example",
+      hint: "Use the direction of the resultant force.",
+      why: "Acceleration follows the resultant force.",
+      nextAction: "Compare the two force directions."
+    }) } }]
+  }), { status: 200, headers: { "content-type": "application/json" } });
+};
+
+try {
+  const coachResponse = await workerModule.default.fetch(
+    new Request("https://example.test/api/hint", {
+      method: "POST",
+      headers: { "content-type": "application/json", "cf-connecting-ip": "test-detect" },
+      body: JSON.stringify({ task: "detect", step: 1, question: "Which direction?", currentAnswer: "left", attempt: 1 })
+    }),
+    { GROQ_API_KEY: "test-only" },
+    {}
+  );
+  assert.equal(coachResponse.status, 200);
+  const coachJson = await coachResponse.json();
+  assert.equal(coachJson.mistakeType, "direction_sign");
+  assert.equal(outboundState.task, "detect");
+
+  const ladderResponse = await workerModule.default.fetch(
+    new Request("https://example.test/api/hint", {
+      method: "POST",
+      headers: { "content-type": "application/json", "cf-connecting-ip": "test-ladder" },
+      body: JSON.stringify({ task: "hint", hintLevel: 3, step: 2, question: "Find net force", attempt: 2 })
+    }),
+    { GROQ_API_KEY: "test-only" },
+    {}
+  );
+  assert.equal(ladderResponse.status, 200);
+  assert.equal(outboundState.task, "hint");
+  assert.equal(outboundState.hintLevel, 3);
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
+console.log("Artifact, AI mistake diagnosis, hint ladder and safe fallback all passed");
