@@ -400,6 +400,8 @@ button { color: inherit; }
 }
 .feedback.success { color: #17683e; background: #e3f5e7; }
 .feedback.retry { color: #87422f; background: #fff0e8; }
+.feedback.thinking { color: #5146a8; background: #f0edff; }
+.feedback.ai { color: #2f5361; background: #e9f4f4; border-left: 3px solid #6d9aa3; }
 .primary-button {
   min-width: 190px;
   margin-top: 22px;
@@ -500,6 +502,7 @@ button { color: inherit; }
   font-size: 20px;
 }
 .help-intro { margin: 8px 0 15px; color: var(--muted); font-size: 12px; }
+.help-privacy { margin: -7px 0 15px; color: #7c8491; font-size: 9px; line-height: 1.45; }
 .help-options { display: grid; gap: 8px; }
 .help-options button {
   width: 100%;

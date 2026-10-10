@@ -1,2 +1,6 @@
 *.tar.gz
 .DS_Store
+dist/
+.env
+.env.*
+!.env.example

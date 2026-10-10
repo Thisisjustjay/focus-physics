@@ -1,0 +1,10 @@
+{
+  "name": "focus-physics",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check site/app.js && node --check worker/index.js && node scripts/validate-artifact.mjs",
+    "preview": "node scripts/preview.mjs"
+  }
+}

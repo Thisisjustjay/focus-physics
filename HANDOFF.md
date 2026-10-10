@@ -11,13 +11,15 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - 当前线上访问模式：public，请保持现有受众设置，除非项目所有者明确要求修改。
 - 本地项目目录：`/Users/guomeixi/Documents/Codex/2026-10-07/ban/work/sites/focus-physics`
 - 当前已发布源码提交：发布后以 `git log -1 --format=%H` 和 Sites 最新版本为准。
-- 技术栈：无构建步骤的静态 HTML/CSS/JavaScript。
+- 技术栈：Cloudflare Worker ESM + 原生 HTML/CSS/JavaScript；构建脚本将前端嵌入 Worker artifact。
 
 ## 2. 主要文件
 
-- `dist/index.html`：页面结构、题干、侧栏、帮助弹窗和暂停弹窗。
-- `dist/styles.css`：全部视觉样式、响应式布局和动画降级设置。
-- `dist/app.js`：5 步题目数据、答题逻辑、反馈、推理记录、帮助菜单和本地保存。
+- `site/index.html`：页面结构、题干、侧栏、帮助弹窗和暂停弹窗。
+- `site/styles.css`：全部视觉样式、响应式布局和动画降级设置。
+- `site/app.js`：5 步题目数据、答题逻辑、AI hint 调用、fallback、推理记录和本地保存。
+- `worker/index.js`：页面资源路由与 `/api/hint` 服务端接口；调用 Groq，但不把密钥暴露给浏览器。
+- `scripts/build.mjs`：生成 `dist/server/index.js` Worker artifact。
 - `.openai/hosting.json`：Sites 项目标识与静态目录配置。不要更换其中的 `project_id`。
 - `focus-physics-site-v11.tar.gz`：上一次发布生成的本地打包产物，目前未被 Git 跟踪；不是源码，不要手工编辑。
 
@@ -52,17 +54,16 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 如果改变状态结构，请考虑旧值兼容或提供安全回退。
 
-## 4. 下一优先级：真正接入 AI
+## 4. AI 提示接口
 
-比赛要求 AI 在产品中执行有用工作；编码时使用 AI 工具本身不算产品功能。当前静态 demo 尚未调用模型 API。
+`I’m stuck!` 的三个帮助选项会把当前题目步骤、当前答案和已验证的 reasoning trail 发送到 `/api/hint`。Scratchpad、姓名、邮箱和 ADHD 信息不会发送。
 
 建议只做一个可靠的核心能力：`misconception-aware hint`。
 
-1. 浏览器把 topic、题干、当前步骤、学生答案、已经验证的 reasoning trail 和所选帮助类型发送到 `/api/hint`。
-2. 服务端 Worker 从环境变量读取 API key，再调用模型；绝对不要把 key 写进 `dist/app.js`。
-3. 模型返回短 JSON：`hint`、`why`、`next_action`。第一次提示不直接给最终答案；保持物理准确、非羞辱、每次只给一个动作。
-4. 后端验证字段、长度和允许的步骤，并设置超时/速率限制。
-5. API 失败时退回现有静态 `steps[currentStep].help`，保证评委仍能完整操作。
+1. Worker 从 secret `GROQ_API_KEY` 读取密钥，并使用 `AI_BASE_URL`、`AI_MODEL` 调用兼容 Chat Completions 的服务。
+2. 模型返回短 JSON：`hint`、`why`、`nextAction`。第一次提示不直接给最终答案；保持物理准确、非羞辱、每次只给一个动作。
+3. 后端验证字段与长度，设置 7 秒超时和轻量每-IP 限流。
+4. API 失败时自动退回现有静态 `steps[currentStep].help`，保证评委仍能完整操作。
 
 开局页的其他 topic world 暂时只作未来方向展示。若来得及扩展，应优先增加一条完整的 Energy 或 Waves 路径；不要让 AI 即兴生成未经验证的物理答案。
 
@@ -89,7 +90,10 @@ python3 -m http.server 4173 --directory dist
 JavaScript 与差异检查：
 
 ```bash
-node --check dist/app.js
+node scripts/build.mjs
+node --check site/app.js
+node --check worker/index.js
+node scripts/validate-artifact.mjs
 git diff --check
 git status --short
 ```

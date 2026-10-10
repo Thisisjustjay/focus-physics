@@ -95,6 +95,7 @@ let currentStep = Number(localStorage.getItem("focusPhysicsStep") || 0);
 if (currentStep < 0 || currentStep >= steps.length) currentStep = 0;
 let selected = null;
 let passed = false;
+let attemptCount = 0;
 
 const title = document.getElementById("missionTitle");
 const context = document.getElementById("missionContext");
@@ -128,6 +129,7 @@ function renderStep() {
   const step = steps[currentStep];
   selected = null;
   passed = false;
+  attemptCount = 0;
   title.textContent = step.title;
   context.textContent = step.context;
   missionCommand.textContent = `${step.command} · YOUR ONE MOVE`;
@@ -302,17 +304,50 @@ check.addEventListener("click", () => {
     showFeedback(message, "success");
     check.innerHTML = currentStep === steps.length - 1 ? "Start a fresh run <span aria-hidden=\"true\">↻</span>" : "Next small step <span aria-hidden=\"true\">→</span>";
   } else {
+    attemptCount += 1;
     const message = step.type === "choice" ? step.feedback[selected] : step.retry;
     showFeedback(message, "retry");
   }
 });
 
 document.querySelectorAll("[data-help]").forEach(button => {
-  button.addEventListener("click", () => {
-    const message = steps[currentStep].help[button.dataset.help];
-    showFeedback(message, "retry");
+  button.addEventListener("click", async () => {
+    const step = steps[currentStep];
+    const fallback = step.help[button.dataset.help];
     setHelpOpen(false);
+    showFeedback("Thinking about one useful next move…", "thinking");
+    feedback.setAttribute("aria-busy", "true");
     feedback.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    let currentAnswer = "No answer selected yet";
+    if (step.type === "choice" && Number.isInteger(selected)) currentAnswer = step.options[selected];
+    if (step.type === "input" && String(selected || "").trim()) currentAnswer = `${selected} ${step.unit}`;
+
+    try {
+      const response = await fetch("/api/hint", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          topic: "Forces in one dimension",
+          problem: "A 5 kg crate has a 20 N force right and 5 N friction left. Find its acceleration. Right is positive.",
+          step: currentStep + 1,
+          command: step.command,
+          question: step.title,
+          currentAnswer,
+          attempt: attemptCount,
+          helpType: button.dataset.help,
+          reasoningSoFar: trailItems.slice(0, currentStep).map(item => `${item.label}: ${item.value}`)
+        })
+      });
+      if (!response.ok) throw new Error("AI hint unavailable");
+      const data = await response.json();
+      const why = data.why ? ` ${data.why}` : "";
+      showFeedback(`AI coach: ${data.hint}${why} Next move: ${data.nextAction}`, "ai");
+    } catch {
+      showFeedback(`${fallback} Static fallback used—your lesson still works.`, "retry");
+    } finally {
+      feedback.removeAttribute("aria-busy");
+    }
   });
 });
 
