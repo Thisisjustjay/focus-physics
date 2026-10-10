@@ -108,13 +108,6 @@ const reasoningTrail = document.getElementById("reasoningTrail");
 const scratchpad = document.getElementById("scratchpad");
 const savedState = document.getElementById("savedState");
 const pauseDialog = document.getElementById("pauseDialog");
-const buddyCard = document.getElementById("buddyCard");
-const buddyImage = document.getElementById("buddyImage");
-const buddyName = document.getElementById("buddyName");
-const buddyReaction = document.getElementById("buddyReaction");
-const buddyDialog = document.getElementById("buddyDialog");
-const closeBuddyDialog = document.getElementById("closeBuddyDialog");
-const companionStorageKey = "focusPhysicsCompanion";
 const topicGate = document.getElementById("topicGate");
 const topicStatus = document.getElementById("topicStatus");
 const lessonSurfaces = [
@@ -122,30 +115,6 @@ const lessonSurfaces = [
   document.querySelector(".app-shell"),
   document.querySelector(".help-dock")
 ];
-
-const companions = {
-  einstein: {
-    name: "Einstein",
-    image: "assets/companion-einstein.png",
-    correct: "Blink! That reasoning checks out.",
-    retry: "Silly face break—then try one smaller step."
-  },
-  cat: {
-    name: "Cat",
-    image: "assets/companion-cat.png",
-    correct: "Meow!",
-    retry: "Woof!"
-  },
-  dog: {
-    name: "Dog",
-    image: "assets/companion-dog.png",
-    correct: "Woof!",
-    retry: "Meow!"
-  }
-};
-
-let selectedCompanion = localStorage.getItem(companionStorageKey);
-if (!companions[selectedCompanion]) selectedCompanion = "cat";
 
 const trailItems = [
   { label: "Prediction", value: "acceleration → right" },
@@ -263,29 +232,6 @@ function showFeedback(message, kind) {
   feedback.hidden = false;
 }
 
-function renderCompanion() {
-  const companion = companions[selectedCompanion];
-  buddyImage.src = companion.image;
-  buddyName.textContent = companion.name;
-  buddyCard.classList.toggle("is-einstein", selectedCompanion === "einstein");
-  buddyCard.classList.remove("is-correct", "is-retry");
-  buddyReaction.textContent = "Ready when you are.";
-}
-
-function reactCompanion(isCorrect) {
-  const companion = companions[selectedCompanion];
-  buddyCard.classList.remove("is-correct", "is-retry");
-  void buddyCard.offsetWidth;
-  buddyCard.classList.add(isCorrect ? "is-correct" : "is-retry");
-  buddyReaction.textContent = isCorrect ? companion.correct : companion.retry;
-}
-
-function openBuddyChooser(required = false) {
-  buddyDialog.dataset.required = String(required);
-  closeBuddyDialog.hidden = required;
-  if (!buddyDialog.open) buddyDialog.showModal();
-}
-
 function setTopicGate(open) {
   document.body.classList.toggle("topic-gate-open", open);
   topicGate.setAttribute("aria-hidden", String(!open));
@@ -295,11 +241,7 @@ function setTopicGate(open) {
     else surface.removeAttribute("inert");
   });
 
-  if (open) {
-    topicGate.querySelector(".topic-ready").focus({ preventScroll: true });
-  } else if (!localStorage.getItem(companionStorageKey)) {
-    setTimeout(() => openBuddyChooser(true), 180);
-  }
+  if (open) topicGate.querySelector(".topic-ready").focus({ preventScroll: true });
 }
 
 function enterForcesLesson() {
@@ -358,12 +300,10 @@ check.addEventListener("click", () => {
     updateReasoningTrail();
     const message = step.type === "choice" ? step.feedback[selected] : step.success;
     showFeedback(message, "success");
-    reactCompanion(true);
     check.innerHTML = currentStep === steps.length - 1 ? "Start a fresh run <span aria-hidden=\"true\">↻</span>" : "Next small step <span aria-hidden=\"true\">→</span>";
   } else {
     const message = step.type === "choice" ? step.feedback[selected] : step.retry;
     showFeedback(message, "retry");
-    reactCompanion(false);
   }
 });
 
@@ -446,25 +386,5 @@ document.getElementById("pauseButton").addEventListener("click", () => {
 document.getElementById("closeDialog").addEventListener("click", () => pauseDialog.close());
 document.getElementById("resumeButton").addEventListener("click", () => pauseDialog.close());
 
-document.querySelectorAll("[data-buddy]").forEach(button => {
-  button.addEventListener("click", () => {
-    selectedCompanion = button.dataset.buddy;
-    localStorage.setItem(companionStorageKey, selectedCompanion);
-    renderCompanion();
-    buddyDialog.close();
-    document.getElementById("changeBuddy").focus();
-  });
-});
-
-document.getElementById("changeBuddy").addEventListener("click", () => openBuddyChooser(false));
-closeBuddyDialog.addEventListener("click", () => buddyDialog.close());
-buddyDialog.addEventListener("cancel", event => {
-  if (buddyDialog.dataset.required === "true") event.preventDefault();
-});
-
-renderCompanion();
 renderStep();
 setTopicGate(location.hash !== "#lesson");
-if (location.hash === "#lesson" && !localStorage.getItem(companionStorageKey)) {
-  setTimeout(() => openBuddyChooser(true), 0);
-}

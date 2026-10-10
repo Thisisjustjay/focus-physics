@@ -45,18 +45,10 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - 正确与错误反馈使用轻量 Gen Alpha 语气，例如 `Big W`、`caught in 4K`，但每条都紧跟准确物理解释，不能嘲笑学生。
 - 页面支持移动端，并遵守 `prefers-reduced-motion`。
 
-### 即时奖励伙伴
-
-- 首次进入完整课时前选择 Einstein、Cat 或 Dog；选择保存在 `focusPhysicsCompanion`。
-- Einstein：正确时眨眼、错误时吐舌头；Cat 和 Dog 使用互换的 meow/woof 反应。
-- 伙伴位于右栏 Scratchpad 上方，并保留 `Change buddy`。
-- 默认不自动播放声音；奖励通过短动画、气泡文字和 `aria-live` 提供。
-
 ### 浏览器本地状态
 
 - `focusPhysicsStep`：当前步骤编号。
 - `focusPhysicsNotes`：Scratchpad 内容。
-- `focusPhysicsCompanion`：当前伙伴。
 
 如果改变状态结构，请考虑旧值兼容或提供安全回退。
 
@@ -104,9 +96,6 @@ git status --short
 
 测试时至少覆盖：
 
-- 三个伙伴的首次选择和再次更换。
-- 每个伙伴的正确与错误反应。
-- 选择刷新后仍保留。
 - 5 个学习步骤全部可以继续前进并重新开始。
 - `I’m stuck!`、Scratchpad、Pause & save 和 Reasoning so far 没有被破坏。
 - 桌面、窄屏和 `prefers-reduced-motion`。
@@ -126,8 +115,6 @@ git status --short
 
 ## 8. 设计底线
 
-- 伙伴奖励要快、短、轻，不要用高饱和闪烁、粒子雨、连续音效或长动画。
 - 不要因答错而羞辱学生；错误反应可以顽皮，但必须同时给出清楚的下一步。
-- 不要让奖励卡遮挡题目、反馈、单位或帮助入口。
 - 不要删掉目前已有的单位、sign/magnitude 检查、推理记录和左侧固定原则卡。
 - 页面目前是英文 UI；新增伙伴文案也应保持英文，除非项目所有者决定整体本地化。

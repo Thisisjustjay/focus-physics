@@ -536,94 +536,12 @@ button { color: inherit; }
   align-self: start;
   gap: 14px;
 }
-.buddy-card, .scratch-panel {
+.scratch-panel {
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: rgba(255,255,255,.58);
 }
-.buddy-card {
-  position: relative;
-  overflow: hidden;
-  padding-bottom: 18px;
-  background: linear-gradient(145deg, rgba(238,235,255,.72), rgba(255,254,250,.72));
-}
-.buddy-heading { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
-.buddy-heading h2 { margin: 0; font: 800 18px/1.2 "Manrope", sans-serif; }
-.buddy-change {
-  flex: 0 0 auto;
-  padding: 5px 8px;
-  border: 1px solid #cbc5bd;
-  border-radius: 8px;
-  color: var(--muted);
-  background: rgba(255,255,255,.72);
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.buddy-change:hover, .buddy-change:focus-visible { border-color: var(--purple); color: var(--purple-dark); }
-.buddy-stage {
-  width: 112px;
-  height: 112px;
-  margin: 9px auto 4px;
-  position: relative;
-  display: grid;
-  place-items: center;
-}
-.buddy-portrait { width: 100%; height: 100%; object-fit: contain; transform-origin: center 48%; }
-.buddy-name { margin: 0; text-align: center; font-size: 12px; font-weight: 800; }
-.buddy-reaction {
-  min-height: 36px;
-  margin: 8px 0 0;
-  padding: 9px 12px;
-  border-radius: 11px;
-  color: #555e6d;
-  background: rgba(255,255,255,.78);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
-  text-align: center;
-}
-.buddy-card.is-correct .buddy-reaction { color: #27603f; background: rgba(223,243,223,.82); }
-.buddy-card.is-retry .buddy-reaction { color: #7b533d; background: rgba(247,232,218,.88); }
-.buddy-card.is-correct:not(.is-einstein) .buddy-portrait { animation: buddy-hop .55s ease; }
-.buddy-card.is-retry:not(.is-einstein) .buddy-portrait { animation: buddy-tilt .55s ease; }
-.buddy-card.is-einstein.is-correct .buddy-portrait { animation: einstein-blink .58s ease; }
-.einstein-tongue {
-  width: 16px;
-  height: 20px;
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  border: 2px solid #8f645d;
-  border-radius: 5px 5px 10px 10px;
-  background: #d99a98;
-  opacity: 0;
-  transform: translate(-50%, -5px);
-}
-.buddy-card.is-einstein.is-retry .einstein-tongue { animation: tongue-out .8s ease both; }
-.buddy-dialog { max-width: 680px; }
-.buddy-dialog > p:not(.eyebrow) { margin-bottom: 22px; }
-.buddy-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.buddy-choices button {
-  min-width: 0;
-  padding: 15px 10px;
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: rgba(255,255,255,.72);
-  cursor: pointer;
-}
-.buddy-choices button:hover, .buddy-choices button:focus-visible { border-color: var(--purple); background: var(--purple-soft); }
-.buddy-choices img { width: 98px; height: 98px; object-fit: contain; }
-.buddy-choices strong { font: 800 14px "Manrope", sans-serif; }
-.buddy-choices span { color: var(--muted); font-size: 10px; line-height: 1.35; }
-@keyframes buddy-hop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-8px); } }
-@keyframes buddy-tilt { 0%, 100% { transform: rotate(0); } 35% { transform: rotate(-5deg); } 70% { transform: rotate(4deg); } }
-@keyframes einstein-blink { 0%, 38%, 65%, 100% { transform: scaleY(1); } 48%, 57% { transform: scaleY(.12); } }
-@keyframes tongue-out { 0% { opacity: 0; transform: translate(-50%, -5px); } 35%, 82% { opacity: 1; transform: translate(-50%, 3px); } 100% { opacity: 0; transform: translate(-50%, -5px); } }
 .scratch-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
 .scratch-heading h2 { font-size: 20px; }
 .saved-state { color: var(--green); font-size: 10px; font-weight: 700; }
@@ -691,10 +609,6 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
   .force-diagram { max-width: 330px; margin: 0 auto; }
   .mission-card { padding: 28px 22px 24px; }
   .right-rail { margin-top: 18px; grid-template-columns: 1fr; }
-  .buddy-card { max-width: 420px; }
-  .buddy-choices { grid-template-columns: 1fr; }
-  .buddy-choices button { grid-template-columns: 76px 1fr; justify-items: start; text-align: left; }
-  .buddy-choices img { width: 70px; height: 70px; grid-row: 1 / 3; }
   .help-dock { right: 16px; bottom: 14px; width: calc(100vw - 32px); }
   .help-launcher { width: 132px; min-height: 76px; }
   .help-popover { bottom: 86px; max-height: calc(100vh - 120px); overflow-y: auto; }
@@ -708,5 +622,4 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
-  .buddy-card.is-einstein.is-retry .einstein-tongue { opacity: 1; transform: translate(-50%, 3px); }
 }

@@ -164,23 +164,7 @@
 
       </section>
 
-      <aside class="right-rail" aria-label="Reward buddy and workspace">
-        <section class="buddy-card" id="buddyCard" aria-labelledby="buddyTitle">
-          <div class="buddy-heading">
-            <div>
-              <p class="eyebrow">SMALL REWARD</p>
-              <h2 id="buddyTitle">Your study buddy</h2>
-            </div>
-            <button class="buddy-change" id="changeBuddy" type="button">Change buddy</button>
-          </div>
-          <div class="buddy-stage" aria-hidden="true">
-            <img id="buddyImage" class="buddy-portrait" src="assets/companion-cat.png" alt="" />
-            <span class="einstein-tongue"></span>
-          </div>
-          <p class="buddy-name" id="buddyName">Cat</p>
-          <p class="buddy-reaction" id="buddyReaction" aria-live="polite">Ready when you are.</p>
-        </section>
-
+      <aside class="right-rail" aria-label="Workspace">
         <section class="scratch-panel">
           <div class="scratch-heading">
             <div>
@@ -229,30 +213,6 @@
       <h2>Good stopping point.</h2>
       <p id="resumeSummary">When you return, your next move will be waiting here.</p>
       <button class="primary-button" id="resumeButton" type="button">Resume this step</button>
-    </dialog>
-
-    <dialog class="buddy-dialog" id="buddyDialog" aria-labelledby="buddyDialogTitle">
-      <button class="dialog-close" id="closeBuddyDialog" type="button" aria-label="Close buddy chooser">×</button>
-      <p class="eyebrow">CHOOSE A CALM STUDY COMPANION</p>
-      <h2 id="buddyDialogTitle">Who should celebrate your checked answers?</h2>
-      <p>Pick one now. You can change your buddy at any time.</p>
-      <div class="buddy-choices">
-        <button type="button" data-buddy="einstein">
-          <img src="assets/companion-einstein.png" alt="" />
-          <strong>Einstein</strong>
-          <span>Blinks or pulls a silly face</span>
-        </button>
-        <button type="button" data-buddy="cat">
-          <img src="assets/companion-cat.png" alt="" />
-          <strong>Cat</strong>
-          <span>Celebrates with a meow</span>
-        </button>
-        <button type="button" data-buddy="dog">
-          <img src="assets/companion-dog.png" alt="" />
-          <strong>Dog</strong>
-          <span>Celebrates with a woof</span>
-        </button>
-      </div>
     </dialog>
 
     <script src="app.js"></script>
