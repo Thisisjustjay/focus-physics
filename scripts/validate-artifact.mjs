@@ -19,6 +19,9 @@ const pageSource = await pageResponse.text();
 assert.match(pageSource, /Focus Physics/);
 assert.match(pageSource, /id="startTestButton"/);
 assert.match(pageSource, /id="understandingInput"/);
+assert.match(pageSource, /id="experimentReward"/);
+assert.match(pageSource, /id="experimentDialog"/);
+assert.match(pageSource, /id="pushForceInput"/);
 const hintResponse = await workerModule.default.fetch(
   new Request("https://example.test/api/hint", {
     method: "POST",
@@ -46,6 +49,9 @@ assert.match(appSource, /MISTAKE DETECTIVE/);
 assert.match(appSource, /Worked example/);
 assert.match(appSource, /resetButton/);
 assert.match(appSource, /\/api\/understanding/);
+assert.match(appSource, /focusPhysicsCorrectSteps/);
+assert.match(appSource, /recordCorrectStep/);
+assert.match(appSource, /updateExperiment/);
 
 const originalFetch = globalThis.fetch;
 let outboundState;
@@ -115,4 +121,4 @@ try {
   globalThis.fetch = originalFetch;
 }
 
-console.log("Artifact, mode chooser, AI concept check, mistake diagnosis, hint ladder and safe fallbacks all passed");
+console.log("Artifact, mode chooser, AI concept check, mistake diagnosis, hint ladder, Force Lab reward and safe fallbacks all passed");

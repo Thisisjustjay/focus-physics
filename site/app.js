@@ -123,6 +123,14 @@ let passed = false;
 let attemptCount = 0;
 let hintLevel = 0;
 let coachRequestId = 0;
+let storedCorrectSteps = [];
+try {
+  storedCorrectSteps = JSON.parse(localStorage.getItem("focusPhysicsCorrectSteps") || "[]");
+} catch {
+  storedCorrectSteps = [];
+}
+let correctSteps = new Set(storedCorrectSteps.filter(index => Number.isInteger(index) && index >= 0 && index < steps.length));
+let experimentUnlocked = localStorage.getItem("focusPhysicsExperimentUnlocked") === "true" || correctSteps.size >= 3;
 
 const title = document.getElementById("missionTitle");
 const context = document.getElementById("missionContext");
@@ -143,6 +151,16 @@ const understandingInput = document.getElementById("understandingInput");
 const understandingButton = document.getElementById("understandingButton");
 const understandingResponse = document.getElementById("understandingResponse");
 const understandingCount = document.getElementById("understandingCount");
+const experimentProgressLabel = document.getElementById("experimentProgressLabel");
+const experimentRewardCopy = document.getElementById("experimentRewardCopy");
+const experimentRewardDots = document.getElementById("experimentRewardDots");
+const experimentLockIcon = document.getElementById("experimentLockIcon");
+const openExperimentButton = document.getElementById("openExperimentButton");
+const experimentUnlockDialog = document.getElementById("experimentUnlockDialog");
+const experimentDialog = document.getElementById("experimentDialog");
+const pushForceInput = document.getElementById("pushForceInput");
+const frictionForceInput = document.getElementById("frictionForceInput");
+const massInput = document.getElementById("massInput");
 const lessonSurfaces = [
   document.querySelector(".site-header"),
   document.querySelector(".app-shell"),
@@ -156,6 +174,66 @@ const trailItems = [
   { label: "Acceleration", value: "15 N ÷ 5 kg = 3 m/s² right" },
   { label: "Check", value: "units ✓  sign ✓  magnitude ✓" }
 ];
+
+function persistExperimentProgress() {
+  localStorage.setItem("focusPhysicsCorrectSteps", JSON.stringify([...correctSteps].sort((a, b) => a - b)));
+  if (experimentUnlocked) localStorage.setItem("focusPhysicsExperimentUnlocked", "true");
+}
+
+function updateExperimentReward() {
+  const progress = Math.min(correctSteps.size, 3);
+  experimentProgressLabel.textContent = experimentUnlocked ? "Experiment unlocked" : `${progress} / 3 correct`;
+  experimentRewardCopy.textContent = experimentUnlocked
+    ? "Change force, friction and mass. See Newton’s second law move."
+    : `Get ${3 - progress} more different ${3 - progress === 1 ? "step" : "steps"} right to unlock the experiment.`;
+  experimentLockIcon.textContent = experimentUnlocked ? "✓" : "⚗";
+  experimentRewardDots.querySelectorAll("span").forEach((dot, index) => dot.classList.toggle("filled", index < progress));
+  openExperimentButton.disabled = !experimentUnlocked;
+  openExperimentButton.innerHTML = experimentUnlocked
+    ? "Open Force Lab <span aria-hidden=\"true\">→</span>"
+    : `<span aria-hidden="true">🔒</span> ${3 - progress} correct ${3 - progress === 1 ? "answer" : "answers"} to unlock`;
+  document.getElementById("experimentReward").classList.toggle("unlocked", experimentUnlocked);
+}
+
+function recordCorrectStep(stepIndex) {
+  const previousCount = correctSteps.size;
+  correctSteps.add(stepIndex);
+  if (correctSteps.size === previousCount) return;
+
+  const newlyUnlocked = !experimentUnlocked && correctSteps.size >= 3;
+  if (newlyUnlocked) experimentUnlocked = true;
+  persistExperimentProgress();
+  updateExperimentReward();
+  if (newlyUnlocked) experimentUnlockDialog.showModal();
+}
+
+function updateExperiment() {
+  const push = Number(pushForceInput.value);
+  const friction = Number(frictionForceInput.value);
+  const mass = Number(massInput.value);
+  const net = push - friction;
+  const acceleration = net / mass;
+  const direction = net > 0 ? "right" : net < 0 ? "left" : "balanced";
+
+  document.getElementById("pushForceValue").textContent = `${push} N`;
+  document.getElementById("frictionForceValue").textContent = `${friction} N`;
+  document.getElementById("massValue").textContent = `${mass} kg`;
+  document.getElementById("labNetForce").textContent = net === 0 ? "0 N · balanced" : `${Math.abs(net)} N ${direction}`;
+  document.getElementById("labAcceleration").textContent = net === 0 ? "0.00 m/s²" : `${Math.abs(acceleration).toFixed(2)} m/s² ${direction}`;
+  document.getElementById("labCrate").textContent = `${mass} kg`;
+  document.getElementById("labCrate").style.transform = `translateX(${Math.max(-48, Math.min(48, net * 2))}px)`;
+  document.getElementById("labRightArrow").style.width = `${Math.max(8, push * 4)}px`;
+  document.getElementById("labLeftArrow").style.width = `${Math.max(8, friction * 4)}px`;
+
+  const observation = document.getElementById("labObservation");
+  if (net === 0) {
+    observation.textContent = "Perfect balance: the forces cancel, so the crate has no acceleration.";
+  } else if (Math.abs(acceleration) >= 5) {
+    observation.textContent = `Big acceleration unlocked: a lighter mass or larger net force makes the change in motion stronger.`;
+  } else {
+    observation.textContent = `The resultant force points ${direction}, so acceleration points ${direction} too.`;
+  }
+}
 
 function renderStep() {
   const step = steps[currentStep];
@@ -540,6 +618,7 @@ check.addEventListener("click", () => {
   const isCorrect = step.type === "choice" ? selected === step.correct : step.correct(selected);
   if (isCorrect) {
     passed = true;
+    recordCorrectStep(currentStep);
     updateReasoningTrail();
     const message = step.type === "choice" ? step.feedback[selected] : step.success;
     showFeedback(message, "success");
@@ -668,6 +747,29 @@ document.getElementById("pauseButton").addEventListener("click", () => {
 
 document.getElementById("closeDialog").addEventListener("click", () => pauseDialog.close());
 document.getElementById("resumeButton").addEventListener("click", () => pauseDialog.close());
+
+function openForceLab() {
+  if (!experimentUnlocked) return;
+  if (experimentUnlockDialog.open) experimentUnlockDialog.close();
+  updateExperiment();
+  experimentDialog.showModal();
+}
+
+openExperimentButton.addEventListener("click", openForceLab);
+document.getElementById("launchExperimentButton").addEventListener("click", openForceLab);
+document.getElementById("closeExperimentUnlock").addEventListener("click", () => experimentUnlockDialog.close());
+document.getElementById("closeExperimentDialog").addEventListener("click", () => experimentDialog.close());
+[pushForceInput, frictionForceInput, massInput].forEach(input => input.addEventListener("input", updateExperiment));
+document.getElementById("resetExperiment").addEventListener("click", () => {
+  pushForceInput.value = "20";
+  frictionForceInput.value = "5";
+  massInput.value = "5";
+  updateExperiment();
+});
+
+if (experimentUnlocked) persistExperimentProgress();
+updateExperimentReward();
+updateExperiment();
 
 renderStep();
 setView(viewFromHash(), false);

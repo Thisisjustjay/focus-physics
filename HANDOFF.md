@@ -46,6 +46,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - Scratchpad 内容保存在浏览器本地。
 - `Pause & save` 会显示当前步骤摘要。
 - 顶部 `Reset lesson` 可随时回到 Step 1，只重置答题进度，不删除 Scratchpad；窄屏时三个顶部操作缩成可访问图标。
+- 三个不同步骤答对后会永久解锁右侧 `Force Lab`。学生可实时调节推力、摩擦力与质量，观察合力、加速度大小和方向；同一步重复答对不会重复计数。
 - 正确与错误反馈使用轻量 Gen Alpha 语气，例如 `Big W`、`caught in 4K`，但每条都紧跟准确物理解释，不能嘲笑学生。
 - 页面支持移动端，并遵守 `prefers-reduced-motion`。
 
@@ -53,6 +54,8 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 - `focusPhysicsStep`：当前步骤编号。
 - `focusPhysicsNotes`：Scratchpad 内容。
+- `focusPhysicsCorrectSteps`：已答对过的不同步骤编号数组，用于计算 `0/3 → 3/3` 奖励进度。
+- `focusPhysicsExperimentUnlocked`：Force Lab 是否已经永久解锁；`Reset lesson` 不会删除该奖励。
 
 如果改变状态结构，请考虑旧值兼容或提供安全回退。
 
@@ -106,6 +109,7 @@ git status --short
 测试时至少覆盖：
 
 - 5 个学习步骤全部可以继续前进并重新开始。
+- 前三个不同步骤答对后只触发一次解锁弹窗；刷新和 Reset 后 Force Lab 仍可打开；滑杆可正确更新 `Fnet`、`a` 和方向。
 - 从 Forces 进入双卡牌页；左卡进入原测试；右卡可在原地输入文字并展示 AI 或 fallback 的三段反馈；浏览器后退能正确返回。
 - `I’m stuck!`、Scratchpad、Pause & save 和 Reasoning so far 没有被破坏。
 - 典型错误会显示 Mistake Detective；连续求助会显示 Hint 1/3、2/3、3/3，答错后第一次求助会自动提升到合适层级。

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=understanding-check" />
+    <link rel="stylesheet" href="styles.css?v=force-lab" />
   </head>
   <body>
     <section class="topic-gate" id="topicGate" aria-labelledby="topicGateTitle">
@@ -231,6 +231,17 @@
             <button type="button" data-formula="a = ">a =</button>
           </div>
         </section>
+
+        <section class="experiment-reward" id="experimentReward" aria-labelledby="experimentRewardTitle">
+          <div class="reward-topline">
+            <span class="reward-icon" id="experimentLockIcon" aria-hidden="true">⚗</span>
+            <span id="experimentProgressLabel">0 / 3 correct</span>
+          </div>
+          <h2 id="experimentRewardTitle">Force Lab</h2>
+          <p id="experimentRewardCopy">Get 3 different steps right to unlock the experiment.</p>
+          <div class="reward-dots" id="experimentRewardDots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <button class="experiment-open" id="openExperimentButton" type="button" disabled><span aria-hidden="true">🔒</span> 3 correct answers to unlock</button>
+        </section>
       </aside>
     </main>
 
@@ -266,6 +277,49 @@
       <button class="primary-button" id="resumeButton" type="button">Resume this step</button>
     </dialog>
 
-    <script src="app.js?v=understanding-check"></script>
+    <dialog class="experiment-unlock-dialog" id="experimentUnlockDialog" aria-labelledby="experimentUnlockTitle">
+      <button class="dialog-close" id="closeExperimentUnlock" aria-label="Close experiment reward">×</button>
+      <span class="unlock-flask" aria-hidden="true">⚗</span>
+      <p class="eyebrow">EXPERIMENT UNLOCKED</p>
+      <h2 id="experimentUnlockTitle">Force Lab is yours.</h2>
+      <p>Three correct steps. Now make the physics move and see what changes.</p>
+      <button class="primary-button" id="launchExperimentButton" type="button">Open Force Lab <span aria-hidden="true">→</span></button>
+    </dialog>
+
+    <dialog class="experiment-dialog" id="experimentDialog" aria-labelledby="experimentTitle">
+      <button class="dialog-close" id="closeExperimentDialog" aria-label="Close Force Lab">×</button>
+      <div class="lab-heading">
+        <div>
+          <p class="eyebrow">UNLOCKED EXPERIMENT</p>
+          <h2 id="experimentTitle">Force Lab</h2>
+        </div>
+        <p>Change one variable. Watch the resultant force and acceleration respond instantly.</p>
+      </div>
+      <div class="lab-layout">
+        <section class="lab-scene" aria-label="Force experiment result">
+          <div class="lab-readout">
+            <div><span>F<sub>net</sub></span><strong id="labNetForce">15 N right</strong></div>
+            <div><span>a</span><strong id="labAcceleration">3.00 m/s² right</strong></div>
+          </div>
+          <div class="lab-track" aria-hidden="true">
+            <div class="lab-force lab-force-left"><span id="labLeftArrow"></span><small>friction</small></div>
+            <div class="lab-crate" id="labCrate">5 kg</div>
+            <div class="lab-force lab-force-right"><span id="labRightArrow"></span><small>push</small></div>
+          </div>
+          <p class="lab-observation" id="labObservation" role="status">The resultant force points right, so acceleration points right too.</p>
+        </section>
+        <section class="lab-controls" aria-label="Experiment controls">
+          <label for="pushForceInput"><span>Push force</span><output id="pushForceValue">20 N</output></label>
+          <input id="pushForceInput" type="range" min="0" max="30" value="20" step="1" />
+          <label for="frictionForceInput"><span>Friction</span><output id="frictionForceValue">5 N</output></label>
+          <input id="frictionForceInput" type="range" min="0" max="20" value="5" step="1" />
+          <label for="massInput"><span>Mass</span><output id="massValue">5 kg</output></label>
+          <input id="massInput" type="range" min="1" max="10" value="5" step="1" />
+          <button class="lab-reset" id="resetExperiment" type="button">↻ Reset experiment</button>
+        </section>
+      </div>
+    </dialog>
+
+    <script src="app.js?v=force-lab"></script>
   </body>
 </html>
