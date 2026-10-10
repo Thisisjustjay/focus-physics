@@ -18,7 +18,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - `site/index.html`：页面结构、题干、侧栏、帮助弹窗和暂停弹窗。
 - `site/styles.css`：全部视觉样式、响应式布局和动画降级设置。
 - `site/app.js`：5 步题目数据、答题逻辑、Mistake Detective、Adaptive Hint Ladder、fallback、推理记录和本地保存。
-- `worker/index.js`：页面资源路由与 `/api/hint` 服务端接口；调用 Groq，但不把密钥暴露给浏览器。
+- `worker/index.js`：页面资源路由与 `/api/hint`、`/api/understanding` 服务端接口；调用 Groq，但不把密钥暴露给浏览器。
 - `scripts/build.mjs`：生成 `dist/server/index.js` Worker artifact。
 - `.openai/hosting.json`：Sites 项目标识与静态目录配置。不要更换其中的 `project_id`。
 - `focus-physics-site-v11.tar.gz`：上一次发布生成的本地打包产物，目前未被 Git 跟踪；不是源码，不要手工编辑。
@@ -27,11 +27,12 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 ### 学习流程
 
-1. 计算前预测加速度方向。
-2. 计算合力，输入框固定显示单位 `N`。
-3. 选择相关物理定律 `Fnet = ma`。
-4. 计算加速度，输入框固定显示单位 `m/s²`。
-5. 同时检查 units、sign 和 magnitude。
+选择 `Forces` 后会先进入双卡牌页面：
+
+1. `Take the 5-step test`：进入原有结构化测试。
+2. `Tell AI what you think`：无需进入新页面，直接输入对该 topic 的任意理解、半理解或疑问；AI 返回“已经理解的部分 / 需要澄清的部分 / 下一问”。
+
+结构化测试本身仍为：预测方向 → 计算合力 → 选择 `Fnet = ma` → 计算加速度 → 检查 units、sign 和 magnitude。
 
 ### ADHD 友好设计
 
@@ -66,6 +67,8 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 3. 后端验证字段与长度，设置 7 秒超时和轻量每-IP 限流。
 4. API 失败时自动退回本地 Mistake Detective 分类和 `steps[currentStep].ladder`，保证评委仍能看到完整体验。
 
+`/api/understanding` 只接收 `topic` 和用户在双卡牌页 textarea 中主动输入的 `thought`（最多 800 字符）。返回严格 JSON：`understood`、`clarify`、`nextQuestion`。前端会分三段展示；请求失败时明确显示内置 backup，不假装 AI 已成功响应。该功能不会读取 Scratchpad、测试答案、身份信息或诊断信息。
+
 开局页的其他 topic world 暂时只作未来方向展示。若来得及扩展，应优先增加一条完整的 Energy 或 Waves 路径；不要让 AI 即兴生成未经验证的物理答案。
 
 ## 5. 代码入口提示
@@ -74,7 +77,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - 正确/错误判断位于 `check.addEventListener("click", ...)`。
 - 页面切换与状态重置位于 `renderStep()` 和 `hideFeedback()`。
 - `Reasoning so far` 由 `updateReasoningTrail()` 生成。
-- 开局页结构在 `site/index.html` 的 `#topicGate`；显示/隐藏逻辑位于 `setTopicGate()`。
+- 开局页结构在 `site/index.html` 的 `#topicGate`；双卡牌页是 `#modeGate`。`site/app.js` 的 `setView()` 在 topics、choose-mode、lesson 三种视图之间切换。
 - 现有三栏布局位于 `.app-shell`；在 `1120px`、`780px` 和 `520px` 媒体查询中同步检查。
 
 ## 6. 本地运行与检查
@@ -103,6 +106,7 @@ git status --short
 测试时至少覆盖：
 
 - 5 个学习步骤全部可以继续前进并重新开始。
+- 从 Forces 进入双卡牌页；左卡进入原测试；右卡可在原地输入文字并展示 AI 或 fallback 的三段反馈；浏览器后退能正确返回。
 - `I’m stuck!`、Scratchpad、Pause & save 和 Reasoning so far 没有被破坏。
 - 典型错误会显示 Mistake Detective；连续求助会显示 Hint 1/3、2/3、3/3，答错后第一次求助会自动提升到合适层级。
 - 桌面、窄屏和 `prefers-reduced-motion`。

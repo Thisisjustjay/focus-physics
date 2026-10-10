@@ -63,6 +63,82 @@ function parseModelJson(content) {
   return { mistakeType, label, hint, why, nextAction };
 }
 
+function parseUnderstandingJson(content) {
+  if (typeof content !== "string") throw new Error("missing model content");
+  const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start < 0 || end <= start) throw new Error("model response was not JSON");
+  const parsed = JSON.parse(cleaned.slice(start, end + 1));
+  const understood = clip(parsed.understood, 320);
+  const clarify = clip(parsed.clarify, 320);
+  const nextQuestion = clip(parsed.nextQuestion || parsed.next_question, 220);
+  if (!understood || !clarify || !nextQuestion) throw new Error("model response missed required fields");
+  return { understood, clarify, nextQuestion };
+}
+
+async function handleUnderstanding(request, env) {
+  if (!allowRequest(request)) return json({ error: "Please wait a moment before trying again." }, 429);
+  if (!env.GROQ_API_KEY) return json({ error: "AI concept checks are temporarily unavailable." }, 503);
+
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > 12_000) return json({ error: "Request is too large." }, 413);
+
+  let incoming;
+  try {
+    incoming = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON." }, 400);
+  }
+
+  const state = {
+    topic: clip(incoming.topic, 80),
+    thought: clip(incoming.thought, 800)
+  };
+  if (state.thought.length < 8) return json({ error: "Please share a little more about what you think." }, 400);
+
+  const systemPrompt = `You are Focus Physics, a calm GCSE Physics concept-check coach. The learner will share freeform thoughts about forces in one dimension. Identify one idea they understand, one precise correction or clarification, and one short Socratic next question. If the learner is accurate, use the clarification to add a useful nuance rather than inventing an error. Never diagnose or mention ADHD, grade intelligence, shame the learner, or infer a stable trait. Keep GCSE-level physics accurate, including resultant force, direction, sign conventions and units.
+
+Return only valid JSON with exactly these string keys: understood, clarify, nextQuestion. Keep understood under 45 words, clarify under 45 words, and nextQuestion under 25 words.`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7_000);
+  try {
+    const baseUrl = String(env.AI_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/$/, "");
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: env.AI_MODEL || "qwen/qwen3.8-27b",
+        temperature: 0.2,
+        max_completion_tokens: 300,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: JSON.stringify(state) }
+        ]
+      }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      console.warn("Groq understanding request failed", response.status);
+      return json({ error: "AI concept check could not be generated." }, 502);
+    }
+
+    const data = await response.json();
+    return json({ ...parseUnderstandingJson(data?.choices?.[0]?.message?.content), source: "ai" });
+  } catch (error) {
+    console.warn("AI understanding error", error instanceof Error ? error.name : "unknown");
+    return json({ error: "AI concept check timed out." }, 502);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function handleHint(request, env) {
   if (!allowRequest(request)) return json({ error: "Please wait a moment before requesting another hint." }, 429);
   if (!env.GROQ_API_KEY) return json({ error: "AI hints are temporarily unavailable." }, 503);
@@ -151,6 +227,12 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { status: 204 });
       if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
       return handleHint(request, env);
+    }
+
+    if (url.pathname === "/api/understanding") {
+      if (request.method === "OPTIONS") return new Response(null, { status: 204 });
+      if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
+      return handleUnderstanding(request, env);
     }
 
     if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed", { status: 405 });

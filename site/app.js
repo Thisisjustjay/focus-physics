@@ -137,7 +137,12 @@ const scratchpad = document.getElementById("scratchpad");
 const savedState = document.getElementById("savedState");
 const pauseDialog = document.getElementById("pauseDialog");
 const topicGate = document.getElementById("topicGate");
+const modeGate = document.getElementById("modeGate");
 const topicStatus = document.getElementById("topicStatus");
+const understandingInput = document.getElementById("understandingInput");
+const understandingButton = document.getElementById("understandingButton");
+const understandingResponse = document.getElementById("understandingResponse");
+const understandingCount = document.getElementById("understandingCount");
 const lessonSurfaces = [
   document.querySelector(".site-header"),
   document.querySelector(".app-shell"),
@@ -368,21 +373,42 @@ async function diagnoseMistake(step, fallbackMessage) {
   }
 }
 
-function setTopicGate(open) {
-  document.body.classList.toggle("topic-gate-open", open);
-  topicGate.setAttribute("aria-hidden", String(!open));
+function viewFromHash() {
+  if (location.hash === "#lesson") return "lesson";
+  if (location.hash === "#choose-mode") return "modes";
+  return "topics";
+}
+
+function setView(view, focus = true) {
+  const showTopics = view === "topics";
+  const showModes = view === "modes";
+  const showLesson = view === "lesson";
+
+  topicGate.setAttribute("aria-hidden", String(!showTopics));
+  topicGate.toggleAttribute("inert", !showTopics);
+  modeGate.setAttribute("aria-hidden", String(!showModes));
+  modeGate.toggleAttribute("inert", !showModes);
+  document.body.classList.toggle("overlay-open", !showLesson);
   lessonSurfaces.forEach(surface => {
     if (!surface) return;
-    if (open) surface.setAttribute("inert", "");
+    if (!showLesson) surface.setAttribute("inert", "");
     else surface.removeAttribute("inert");
   });
 
-  if (open) topicGate.querySelector(".topic-ready").focus({ preventScroll: true });
+  if (!focus) return;
+  if (showTopics) topicGate.querySelector(".topic-ready").focus({ preventScroll: true });
+  if (showModes) document.getElementById("startTestButton").focus({ preventScroll: true });
+}
+
+function navigateTo(view) {
+  const target = view === "lesson" ? "#lesson" : view === "modes" ? "#choose-mode" : location.pathname;
+  const current = viewFromHash();
+  if (current !== view) history.pushState({ view }, "", target);
+  setView(view);
 }
 
 function enterForcesLesson() {
-  if (location.hash !== "#lesson") history.pushState({ view: "lesson" }, "", "#lesson");
-  setTopicGate(false);
+  navigateTo("lesson");
   document.querySelector(".workspace").scrollIntoView({ block: "start" });
 }
 
@@ -390,7 +416,7 @@ document.querySelectorAll("[data-topic]").forEach(button => {
   button.addEventListener("click", () => {
     const topic = button.dataset.topic;
     if (topic === "forces") {
-      enterForcesLesson();
+      navigateTo("modes");
       return;
     }
 
@@ -403,15 +429,16 @@ document.querySelectorAll("[data-topic]").forEach(button => {
 });
 
 document.getElementById("topicButton").addEventListener("click", () => {
-  history.pushState({ view: "topics" }, "", location.pathname);
-  setTopicGate(true);
+  navigateTo("topics");
 });
 
 document.querySelector(".site-header .brand").addEventListener("click", event => {
   event.preventDefault();
-  history.pushState({ view: "topics" }, "", location.pathname);
-  setTopicGate(true);
+  navigateTo("topics");
 });
+
+document.getElementById("modeBackButton").addEventListener("click", () => navigateTo("topics"));
+document.getElementById("startTestButton").addEventListener("click", enterForcesLesson);
 
 document.getElementById("resetButton").addEventListener("click", () => {
   currentStep = 0;
@@ -422,7 +449,80 @@ document.getElementById("resetButton").addEventListener("click", () => {
   document.getElementById("missionCard").scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
-window.addEventListener("popstate", () => setTopicGate(location.hash !== "#lesson"));
+window.addEventListener("popstate", () => setView(viewFromHash()));
+
+let understandingRequestId = 0;
+
+function showUnderstandingResponse(result, source) {
+  const sections = [
+    ["WHAT YOU’VE GOT", result.understood],
+    ["TIGHTEN THIS", result.clarify],
+    ["ONE QUESTION", result.nextQuestion]
+  ];
+  const content = sections.map(([label, copy]) => {
+    const point = document.createElement("div");
+    point.className = "understanding-point";
+    const heading = document.createElement("span");
+    heading.textContent = label;
+    const text = document.createElement("p");
+    text.textContent = copy;
+    point.append(heading, text);
+    return point;
+  });
+  const sourceLabel = document.createElement("small");
+  sourceLabel.className = "understanding-source";
+  sourceLabel.textContent = source;
+  understandingResponse.replaceChildren(...content, sourceLabel);
+  understandingResponse.removeAttribute("aria-busy");
+  understandingResponse.hidden = false;
+}
+
+understandingInput.addEventListener("input", () => {
+  const length = understandingInput.value.length;
+  understandingCount.textContent = `${length} / 800`;
+  understandingButton.disabled = understandingInput.value.trim().length < 8;
+  understandingResponse.hidden = true;
+  understandingRequestId += 1;
+});
+
+understandingButton.addEventListener("click", async () => {
+  const thought = understandingInput.value.trim();
+  if (thought.length < 8) return;
+  const requestId = ++understandingRequestId;
+  understandingButton.disabled = true;
+  understandingInput.readOnly = true;
+  understandingButton.textContent = "Reading your idea…";
+  understandingResponse.textContent = "Finding the strongest idea and one useful next step…";
+  understandingResponse.hidden = false;
+  understandingResponse.setAttribute("aria-busy", "true");
+
+  try {
+    const response = await fetch("/api/understanding", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ topic: "Forces in one dimension", thought })
+    });
+    if (!response.ok) throw new Error("AI concept check unavailable");
+    const data = await response.json();
+    if (requestId !== understandingRequestId) return;
+    showUnderstandingResponse(data, "AI concept check · based only on the text above");
+  } catch {
+    if (requestId === understandingRequestId) {
+      showUnderstandingResponse({
+        understood: "You’re trying to connect force and motion, which is exactly the right conceptual territory.",
+        clarify: "Name the resultant force—not simply the biggest force—and state its direction before using Fnet = ma.",
+        nextQuestion: "What happens to the acceleration if the two horizontal forces are equal?"
+      }, "Built-in backup · AI is temporarily unavailable");
+    }
+  } finally {
+    if (requestId === understandingRequestId) {
+      understandingInput.readOnly = false;
+      understandingButton.disabled = understandingInput.value.trim().length < 8;
+      understandingButton.textContent = "Check my understanding";
+      understandingResponse.removeAttribute("aria-busy");
+    }
+  }
+});
 
 check.addEventListener("click", () => {
   if (passed) {
@@ -572,4 +672,4 @@ document.getElementById("closeDialog").addEventListener("click", () => pauseDial
 document.getElementById("resumeButton").addEventListener("click", () => pauseDialog.close());
 
 renderStep();
-setTopicGate(location.hash !== "#lesson");
+setView(viewFromHash(), false);

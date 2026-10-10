@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=reset-lesson" />
+    <link rel="stylesheet" href="styles.css?v=understanding-check" />
   </head>
   <body>
     <section class="topic-gate" id="topicGate" aria-labelledby="topicGateTitle">
@@ -74,6 +74,55 @@
         <p><strong>Forces is demo-ready.</strong> The other worlds show where adaptive AI lessons can expand next.</p>
       </div>
       <p class="gate-footnote">No streaks. No countdown. Your progress waits for you.</p>
+    </section>
+
+    <section class="mode-gate" id="modeGate" aria-labelledby="modeGateTitle" aria-hidden="true" inert>
+      <header class="mode-header">
+        <button class="mode-back" id="modeBackButton" type="button" aria-label="Back to topics">← <span>Topics</span></button>
+        <div class="brand" aria-label="Focus Physics">
+          <span class="brand-mark" aria-hidden="true">ƒ</span>
+          <span>Focus Physics</span>
+        </div>
+        <span class="calm-mode"><i aria-hidden="true"></i> No timer</span>
+      </header>
+
+      <main class="mode-shell">
+        <div class="mode-copy">
+          <p class="eyebrow">FORCES · CHOOSE YOUR CHECK</p>
+          <h1 id="modeGateTitle">How do you want to check your understanding?</h1>
+          <p>Use a structured test, or explain the idea in your own words. Both are low-pressure.</p>
+        </div>
+
+        <div class="mode-grid">
+          <button class="mode-card test-mode-card" id="startTestButton" type="button">
+            <span class="mode-card-icon" aria-hidden="true">1→5</span>
+            <span class="mode-card-kicker">STRUCTURED</span>
+            <strong>Take the 5-step test</strong>
+            <span class="mode-card-description">Work through one small move at a time with hints whenever you need them.</span>
+            <span class="mode-chips" aria-hidden="true"><i>Direction</i><i>F<sub>net</sub></i><i>F = ma</i><i>Units</i></span>
+            <span class="mode-card-action">Start test <b aria-hidden="true">→</b></span>
+          </button>
+
+          <article class="mode-card understanding-card">
+            <div class="understanding-heading">
+              <span class="mode-card-icon" aria-hidden="true">≈?</span>
+              <div>
+                <span class="mode-card-kicker">AI CONCEPT CHECK</span>
+                <h2>Tell AI what you think</h2>
+              </div>
+            </div>
+            <p class="mode-card-description">Type anything you understand, half-understand, or feel unsure about.</p>
+            <label class="sr-only" for="understandingInput">Your thoughts about forces</label>
+            <textarea id="understandingInput" maxlength="800" placeholder="e.g. I think acceleration follows the biggest force, but I’m not sure how friction changes it…"></textarea>
+            <div class="understanding-controls">
+              <span id="understandingCount">0 / 800</span>
+              <button class="understanding-submit" id="understandingButton" type="button" disabled>Check my understanding</button>
+            </div>
+            <p class="understanding-privacy">Only this text is sent—never your notes, identity or diagnosis.</p>
+            <div class="understanding-response" id="understandingResponse" role="status" aria-live="polite" hidden></div>
+          </article>
+        </div>
+      </main>
     </section>
 
     <header class="site-header">
@@ -217,6 +266,6 @@
       <button class="primary-button" id="resumeButton" type="button">Resume this step</button>
     </dialog>
 
-    <script src="app.js?v=reset-lesson"></script>
+    <script src="app.js?v=understanding-check"></script>
   </body>
 </html>

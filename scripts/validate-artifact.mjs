@@ -15,7 +15,10 @@ assert.equal(typeof workerModule.default?.fetch, "function", "Worker artifact mu
 
 const pageResponse = await workerModule.default.fetch(new Request("https://example.test/"), {}, {});
 assert.equal(pageResponse.status, 200);
-assert.match(await pageResponse.text(), /Focus Physics/);
+const pageSource = await pageResponse.text();
+assert.match(pageSource, /Focus Physics/);
+assert.match(pageSource, /id="startTestButton"/);
+assert.match(pageSource, /id="understandingInput"/);
 const hintResponse = await workerModule.default.fetch(
   new Request("https://example.test/api/hint", {
     method: "POST",
@@ -26,26 +29,44 @@ const hintResponse = await workerModule.default.fetch(
   {}
 );
 assert.equal(hintResponse.status, 503, "Missing secret should fail safely");
+const understandingFallbackResponse = await workerModule.default.fetch(
+  new Request("https://example.test/api/understanding", {
+    method: "POST",
+    headers: { "content-type": "application/json", "cf-connecting-ip": "test-no-secret-understanding" },
+    body: JSON.stringify({ topic: "Forces", thought: "Force changes motion." })
+  }),
+  {},
+  {}
+);
+assert.equal(understandingFallbackResponse.status, 503, "Understanding endpoint should fail safely without its secret");
 
 const appResponse = await workerModule.default.fetch(new Request("https://example.test/app.js"), {}, {});
 const appSource = await appResponse.text();
 assert.match(appSource, /MISTAKE DETECTIVE/);
 assert.match(appSource, /Worked example/);
 assert.match(appSource, /resetButton/);
+assert.match(appSource, /\/api\/understanding/);
 
 const originalFetch = globalThis.fetch;
 let outboundState;
-globalThis.fetch = async (_url, options) => {
+globalThis.fetch = async (url, options) => {
   const outbound = JSON.parse(options.body);
   outboundState = JSON.parse(outbound.messages[1].content);
+  const content = String(url).includes("/chat/completions") && "thought" in outboundState
+    ? {
+        understood: "You connected force with a change in motion.",
+        clarify: "Use resultant force, including direction, before applying Fnet = ma.",
+        nextQuestion: "What if the opposite forces are equal?"
+      }
+    : {
+        mistakeType: outboundState.task === "detect" ? "direction_sign" : "principle",
+        label: outboundState.task === "detect" ? "Direction / sign" : "Worked example",
+        hint: "Use the direction of the resultant force.",
+        why: "Acceleration follows the resultant force.",
+        nextAction: "Compare the two force directions."
+      };
   return new Response(JSON.stringify({
-    choices: [{ message: { content: JSON.stringify({
-      mistakeType: outboundState.task === "detect" ? "direction_sign" : "principle",
-      label: outboundState.task === "detect" ? "Direction / sign" : "Worked example",
-      hint: "Use the direction of the resultant force.",
-      why: "Acceleration follows the resultant force.",
-      nextAction: "Compare the two force directions."
-    }) } }]
+    choices: [{ message: { content: JSON.stringify(content) } }]
   }), { status: 200, headers: { "content-type": "application/json" } });
 };
 
@@ -76,8 +97,22 @@ try {
   assert.equal(ladderResponse.status, 200);
   assert.equal(outboundState.task, "hint");
   assert.equal(outboundState.hintLevel, 3);
+
+  const understandingResponse = await workerModule.default.fetch(
+    new Request("https://example.test/api/understanding", {
+      method: "POST",
+      headers: { "content-type": "application/json", "cf-connecting-ip": "test-understanding" },
+      body: JSON.stringify({ topic: "Forces in one dimension", thought: "I think a larger force means faster acceleration." })
+    }),
+    { GROQ_API_KEY: "test-only" },
+    {}
+  );
+  assert.equal(understandingResponse.status, 200);
+  const understandingJson = await understandingResponse.json();
+  assert.equal(understandingJson.nextQuestion, "What if the opposite forces are equal?");
+  assert.match(outboundState.thought, /larger force/);
 } finally {
   globalThis.fetch = originalFetch;
 }
 
-console.log("Artifact, AI mistake diagnosis, hint ladder and safe fallback all passed");
+console.log("Artifact, mode chooser, AI concept check, mistake diagnosis, hint ladder and safe fallbacks all passed");
