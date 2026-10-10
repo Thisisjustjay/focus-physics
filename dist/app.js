@@ -3,11 +3,6 @@ const steps = [
     command: "PREDICT",
     title: "Before calculating, which way should the crate accelerate?",
     context: "Predict the direction first. No arithmetic yet.",
-    principle: {
-      title: "Resultant force direction",
-      text: "An object accelerates in the direction of the resultant force. Compare opposing forces before calculating.",
-      phase: 0
-    },
     type: "choice",
     options: ["To the right", "To the left", "It will not accelerate"],
     correct: 0,
@@ -26,11 +21,6 @@ const steps = [
     command: "CALCULATE",
     title: "What is the net horizontal force?",
     context: "Enter a number in newtons. Right is positive.",
-    principle: {
-      title: "Resultant force",
-      text: "Forces are vectors. Set right as positive, then combine forces using their directions—not just their sizes.",
-      phase: 1
-    },
     type: "input",
     placeholder: "Fnet = …",
     unit: "N",
@@ -47,11 +37,6 @@ const steps = [
     command: "CHOOSE",
     title: "Which model connects net force and acceleration?",
     context: "Pick the relationship that uses the crate’s mass.",
-    principle: {
-      title: "Newton’s second law",
-      text: "Acceleration depends on the resultant force and the object’s mass. Choose the model that connects all three.",
-      phase: 2
-    },
     type: "choice",
     options: ["Fnet = ma", "E = mc²", "p = mv"],
     correct: 0,
@@ -70,11 +55,6 @@ const steps = [
     command: "CALCULATE",
     title: "Now find the acceleration.",
     context: "Enter a number in m/s². Your setup: 15 N = (5 kg)a.",
-    principle: {
-      title: "Rearrange before substituting",
-      text: "Isolate the unknown symbol first. Only then substitute values, keeping the units attached.",
-      phase: 3
-    },
     type: "input",
     placeholder: "a = …",
     unit: "m/s²",
@@ -91,11 +71,6 @@ const steps = [
     command: "CHECK",
     title: "Final check: which statement passes all three tests?",
     context: "Check the units, sign and magnitude—not just the number.",
-    principle: {
-      title: "Units, sign and magnitude",
-      text: "A complete physics check asks whether the units are correct, the sign matches the direction, and the size is reasonable.",
-      phase: 4
-    },
     type: "choice",
     options: [
       "3 m/s²; positive/right; reasonable after 15 N ÷ 5 kg",
@@ -130,13 +105,40 @@ const missionCommand = document.getElementById("missionCommand");
 const stepEyebrow = document.getElementById("stepEyebrow");
 const progressDots = document.getElementById("progressDots");
 const reasoningTrail = document.getElementById("reasoningTrail");
-const principleCard = document.getElementById("principleCard");
-const principleTitle = document.getElementById("principleTitle");
-const principleText = document.getElementById("principleText");
-const thinkingPhases = [...document.querySelectorAll("#thinkingSequence span")];
 const scratchpad = document.getElementById("scratchpad");
 const savedState = document.getElementById("savedState");
 const pauseDialog = document.getElementById("pauseDialog");
+const buddyCard = document.getElementById("buddyCard");
+const buddyImage = document.getElementById("buddyImage");
+const buddyName = document.getElementById("buddyName");
+const buddyReaction = document.getElementById("buddyReaction");
+const buddyDialog = document.getElementById("buddyDialog");
+const closeBuddyDialog = document.getElementById("closeBuddyDialog");
+const companionStorageKey = "focusPhysicsCompanion";
+
+const companions = {
+  einstein: {
+    name: "Einstein",
+    image: "assets/companion-einstein.png",
+    correct: "Blink! That reasoning checks out.",
+    retry: "Silly face break—then try one smaller step."
+  },
+  cat: {
+    name: "Cat",
+    image: "assets/companion-cat.png",
+    correct: "Meow!",
+    retry: "Woof!"
+  },
+  dog: {
+    name: "Dog",
+    image: "assets/companion-dog.png",
+    correct: "Woof!",
+    retry: "Meow!"
+  }
+};
+
+let selectedCompanion = localStorage.getItem(companionStorageKey);
+if (!companions[selectedCompanion]) selectedCompanion = "cat";
 
 const trailItems = [
   { label: "Prediction", value: "acceleration → right" },
@@ -153,13 +155,9 @@ function renderStep() {
   title.textContent = step.title;
   context.textContent = step.context;
   missionCommand.textContent = `${step.command} · YOUR ONE MOVE`;
-  principleTitle.textContent = step.principle.title;
-  principleText.textContent = step.principle.text;
-  thinkingPhases.forEach((phase, index) => phase.classList.toggle("active", index === step.principle.phase));
   stepEyebrow.textContent = `STEP ${currentStep + 1} OF ${steps.length}`;
   feedback.hidden = true;
   feedback.className = "feedback";
-  principleCard.hidden = true;
   check.disabled = true;
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
   area.innerHTML = "";
@@ -247,7 +245,6 @@ function updateReasoningTrail() {
 function hideFeedback() {
   feedback.hidden = true;
   feedback.className = "feedback";
-  principleCard.hidden = true;
   passed = false;
   updateReasoningTrail();
   check.innerHTML = currentStep === steps.length - 1 ? "Check my reasoning <span aria-hidden=\"true\">→</span>" : "Check my thinking <span aria-hidden=\"true\">→</span>";
@@ -257,7 +254,29 @@ function showFeedback(message, kind) {
   feedback.textContent = message;
   feedback.className = `feedback ${kind}`;
   feedback.hidden = false;
-  principleCard.hidden = false;
+}
+
+function renderCompanion() {
+  const companion = companions[selectedCompanion];
+  buddyImage.src = companion.image;
+  buddyName.textContent = companion.name;
+  buddyCard.classList.toggle("is-einstein", selectedCompanion === "einstein");
+  buddyCard.classList.remove("is-correct", "is-retry");
+  buddyReaction.textContent = "Ready when you are.";
+}
+
+function reactCompanion(isCorrect) {
+  const companion = companions[selectedCompanion];
+  buddyCard.classList.remove("is-correct", "is-retry");
+  void buddyCard.offsetWidth;
+  buddyCard.classList.add(isCorrect ? "is-correct" : "is-retry");
+  buddyReaction.textContent = isCorrect ? companion.correct : companion.retry;
+}
+
+function openBuddyChooser(required = false) {
+  buddyDialog.dataset.required = String(required);
+  closeBuddyDialog.hidden = required;
+  if (!buddyDialog.open) buddyDialog.showModal();
 }
 
 check.addEventListener("click", () => {
@@ -281,10 +300,12 @@ check.addEventListener("click", () => {
     updateReasoningTrail();
     const message = step.type === "choice" ? step.feedback[selected] : step.success;
     showFeedback(message, "success");
+    reactCompanion(true);
     check.innerHTML = currentStep === steps.length - 1 ? "Start a fresh run <span aria-hidden=\"true\">↻</span>" : "Next small step <span aria-hidden=\"true\">→</span>";
   } else {
     const message = step.type === "choice" ? step.feedback[selected] : step.retry;
     showFeedback(message, "retry");
+    reactCompanion(false);
   }
 });
 
@@ -367,4 +388,22 @@ document.getElementById("pauseButton").addEventListener("click", () => {
 document.getElementById("closeDialog").addEventListener("click", () => pauseDialog.close());
 document.getElementById("resumeButton").addEventListener("click", () => pauseDialog.close());
 
+document.querySelectorAll("[data-buddy]").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedCompanion = button.dataset.buddy;
+    localStorage.setItem(companionStorageKey, selectedCompanion);
+    renderCompanion();
+    buddyDialog.close();
+    document.getElementById("changeBuddy").focus();
+  });
+});
+
+document.getElementById("changeBuddy").addEventListener("click", () => openBuddyChooser(false));
+closeBuddyDialog.addEventListener("click", () => buddyDialog.close());
+buddyDialog.addEventListener("cancel", event => {
+  if (buddyDialog.dataset.required === "true") event.preventDefault();
+});
+
+renderCompanion();
 renderStep();
+if (!localStorage.getItem(companionStorageKey)) setTimeout(() => openBuddyChooser(true), 0);
