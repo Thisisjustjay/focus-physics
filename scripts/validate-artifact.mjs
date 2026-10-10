@@ -31,6 +31,7 @@ const appResponse = await workerModule.default.fetch(new Request("https://exampl
 const appSource = await appResponse.text();
 assert.match(appSource, /MISTAKE DETECTIVE/);
 assert.match(appSource, /Worked example/);
+assert.match(appSource, /resetButton/);
 
 const originalFetch = globalThis.fetch;
 let outboundState;

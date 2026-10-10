@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=mistake-ladder" />
+    <link rel="stylesheet" href="styles.css?v=reset-lesson" />
   </head>
   <body>
     <section class="topic-gate" id="topicGate" aria-labelledby="topicGateTitle">
@@ -82,8 +82,9 @@
         <span>Focus Physics</span>
       </a>
       <div class="header-actions">
-        <button class="ghost-button" id="topicButton" type="button">Change topic</button>
-        <button class="ghost-button" id="pauseButton" type="button">Pause &amp; save</button>
+        <button class="ghost-button reset-button" id="resetButton" type="button" aria-label="Reset lesson progress and return to step 1"><span class="header-icon" aria-hidden="true">↻</span><span class="button-label">Reset lesson</span></button>
+        <button class="ghost-button" id="topicButton" type="button" aria-label="Change topic"><span class="header-icon" aria-hidden="true">⌂</span><span class="button-label">Change topic</span></button>
+        <button class="ghost-button" id="pauseButton" type="button" aria-label="Pause and save"><span class="header-icon" aria-hidden="true">Ⅱ</span><span class="button-label">Pause &amp; save</span></button>
       </div>
     </header>
 
@@ -216,6 +217,6 @@
       <button class="primary-button" id="resumeButton" type="button">Resume this step</button>
     </dialog>
 
-    <script src="app.js?v=mistake-ladder"></script>
+    <script src="app.js?v=reset-lesson"></script>
   </body>
 </html>

@@ -413,6 +413,15 @@ document.querySelector(".site-header .brand").addEventListener("click", event =>
   setTopicGate(true);
 });
 
+document.getElementById("resetButton").addEventListener("click", () => {
+  currentStep = 0;
+  localStorage.setItem("focusPhysicsStep", "0");
+  setHelpOpen(false);
+  renderStep();
+  showFeedback("Fresh start: back to Step 1. Your scratchpad is still here.", "ai");
+  document.getElementById("missionCard").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
 window.addEventListener("popstate", () => setTopicGate(location.hash !== "#lesson"));
 
 check.addEventListener("click", () => {

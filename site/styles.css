@@ -163,6 +163,8 @@ button { color: inherit; }
   font-weight: 700;
 }
 .ghost-button:hover { background: white; }
+.reset-button { color: #625a50; }
+.header-icon { margin-right: 5px; font-weight: 900; }
 
 .app-shell {
   max-width: 1500px;
@@ -625,6 +627,8 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
   .topic-orb { position: relative; inset: auto; width: 100%; min-height: 94px; transform: none; animation: none; }
   .topic-status { margin-top: 18px; }
   .site-header { padding: 0 18px; }
+  .header-actions { gap: 7px; }
+  .ghost-button { padding: 9px 11px; font-size: 12px; }
   .app-shell { display: block; padding: 22px 16px 40px; }
   .progress-panel { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 15px; padding: 5px 2px 20px; }
   .progress-panel h1 { font-size: 20px; }
@@ -643,6 +647,10 @@ dialog > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
 }
 
 @media (max-width: 520px) {
+  .site-header .brand > span:last-child { display: none; }
+  .header-actions .button-label { display: none; }
+  .header-icon { margin-right: 0; }
+  .header-actions .ghost-button { width: 40px; height: 40px; padding: 0; }
   .topic-scene { grid-template-columns: 1fr; }
   .topic-orb { grid-template-columns: 46px 1fr; min-height: 82px; }
   .topic-pixel { width: 44px; height: 44px; }
