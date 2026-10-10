@@ -1,7 +1,8 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = resolve(new URL("..", import.meta.url).pathname);
+const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const dist = resolve(root, "dist");
 const workerTemplate = await readFile(resolve(root, "worker/index.js"), "utf8");
 const [html, css, js] = await Promise.all([
