@@ -115,6 +115,13 @@ const buddyReaction = document.getElementById("buddyReaction");
 const buddyDialog = document.getElementById("buddyDialog");
 const closeBuddyDialog = document.getElementById("closeBuddyDialog");
 const companionStorageKey = "focusPhysicsCompanion";
+const topicGate = document.getElementById("topicGate");
+const topicStatus = document.getElementById("topicStatus");
+const lessonSurfaces = [
+  document.querySelector(".site-header"),
+  document.querySelector(".app-shell"),
+  document.querySelector(".help-dock")
+];
 
 const companions = {
   einstein: {
@@ -279,6 +286,57 @@ function openBuddyChooser(required = false) {
   if (!buddyDialog.open) buddyDialog.showModal();
 }
 
+function setTopicGate(open) {
+  document.body.classList.toggle("topic-gate-open", open);
+  topicGate.setAttribute("aria-hidden", String(!open));
+  lessonSurfaces.forEach(surface => {
+    if (!surface) return;
+    if (open) surface.setAttribute("inert", "");
+    else surface.removeAttribute("inert");
+  });
+
+  if (open) {
+    topicGate.querySelector(".topic-ready").focus({ preventScroll: true });
+  } else if (!localStorage.getItem(companionStorageKey)) {
+    setTimeout(() => openBuddyChooser(true), 180);
+  }
+}
+
+function enterForcesLesson() {
+  if (location.hash !== "#lesson") history.pushState({ view: "lesson" }, "", "#lesson");
+  setTopicGate(false);
+  document.querySelector(".workspace").scrollIntoView({ block: "start" });
+}
+
+document.querySelectorAll("[data-topic]").forEach(button => {
+  button.addEventListener("click", () => {
+    const topic = button.dataset.topic;
+    if (topic === "forces") {
+      enterForcesLesson();
+      return;
+    }
+
+    const label = button.querySelector("strong").textContent;
+    topicStatus.classList.remove("topic-status-bump");
+    void topicStatus.offsetWidth;
+    topicStatus.classList.add("topic-status-bump");
+    topicStatus.innerHTML = `<span aria-hidden="true">○</span><p><strong>${label} is the next world.</strong> Today’s working demo is Forces; AI-generated topic paths are the next build.</p>`;
+  });
+});
+
+document.getElementById("topicButton").addEventListener("click", () => {
+  history.pushState({ view: "topics" }, "", location.pathname);
+  setTopicGate(true);
+});
+
+document.querySelector(".site-header .brand").addEventListener("click", event => {
+  event.preventDefault();
+  history.pushState({ view: "topics" }, "", location.pathname);
+  setTopicGate(true);
+});
+
+window.addEventListener("popstate", () => setTopicGate(location.hash !== "#lesson"));
+
 check.addEventListener("click", () => {
   if (passed) {
     if (currentStep === steps.length - 1) {
@@ -406,4 +464,7 @@ buddyDialog.addEventListener("cancel", event => {
 
 renderCompanion();
 renderStep();
-if (!localStorage.getItem(companionStorageKey)) setTimeout(() => openBuddyChooser(true), 0);
+setTopicGate(location.hash !== "#lesson");
+if (location.hash === "#lesson" && !localStorage.getItem(companionStorageKey)) {
+  setTimeout(() => openBuddyChooser(true), 0);
+}

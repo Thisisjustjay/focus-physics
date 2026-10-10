@@ -11,12 +11,78 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <section class="topic-gate" id="topicGate" aria-labelledby="topicGateTitle">
+      <div class="pixel-sky" aria-hidden="true">
+        <span class="pixel-cloud cloud-one"></span>
+        <span class="pixel-cloud cloud-two"></span>
+        <span class="pixel-star star-one">+</span>
+        <span class="pixel-star star-two">·</span>
+        <span class="pixel-star star-three">+</span>
+        <span class="pixel-hill hill-back"></span>
+        <span class="pixel-hill hill-front"></span>
+      </div>
+
+      <header class="gate-header">
+        <div class="brand" aria-label="Focus Physics">
+          <span class="brand-mark" aria-hidden="true">ƒ</span>
+          <span>Focus Physics</span>
+        </div>
+        <span class="calm-mode"><i aria-hidden="true"></i> Calm mode · no timer</span>
+      </header>
+
+      <div class="gate-copy">
+        <p class="eyebrow">TODAY'S LITTLE QUEST</p>
+        <h1 id="topicGateTitle">Pick a physics world.</h1>
+        <p>Choose one place to begin. You only need to make one small move at a time.</p>
+      </div>
+
+      <div class="topic-scene" id="topicScene" aria-label="Physics topic choices">
+        <button class="topic-orb topic-ready" type="button" data-topic="forces" style="--x: 9%; --y: 14%; --tilt: -2deg; --delay: 0s;">
+          <span class="topic-pixel" aria-hidden="true">→□←</span>
+          <strong>Forces</strong>
+          <small>Ready · 5 calm steps</small>
+        </button>
+        <button class="topic-orb" type="button" data-topic="energy" style="--x: 61%; --y: 4%; --tilt: 2deg; --delay: -1s;">
+          <span class="topic-pixel" aria-hidden="true">⚡</span>
+          <strong>Energy</strong>
+          <small>Next world</small>
+        </button>
+        <button class="topic-orb" type="button" data-topic="waves" style="--x: 74%; --y: 48%; --tilt: -1deg; --delay: -2s;">
+          <span class="topic-pixel" aria-hidden="true">∿∿</span>
+          <strong>Waves</strong>
+          <small>Next world</small>
+        </button>
+        <button class="topic-orb" type="button" data-topic="electricity" style="--x: 39%; --y: 59%; --tilt: 1deg; --delay: -.6s;">
+          <span class="topic-pixel" aria-hidden="true">+ −</span>
+          <strong>Electricity</strong>
+          <small>Next world</small>
+        </button>
+        <button class="topic-orb" type="button" data-topic="particles" style="--x: 3%; --y: 58%; --tilt: 2deg; --delay: -1.5s;">
+          <span class="topic-pixel" aria-hidden="true">···</span>
+          <strong>Particles</strong>
+          <small>Next world</small>
+        </button>
+        <button class="topic-orb" type="button" data-topic="magnetism" style="--x: 34%; --y: 2%; --tilt: -2deg; --delay: -2.4s;">
+          <span class="topic-pixel" aria-hidden="true">N⌒S</span>
+          <strong>Magnetism</strong>
+          <small>Next world</small>
+        </button>
+      </div>
+
+      <div class="topic-status" id="topicStatus" role="status">
+        <span aria-hidden="true">✦</span>
+        <p><strong>Forces is demo-ready.</strong> The other worlds show where adaptive AI lessons can expand next.</p>
+      </div>
+      <p class="gate-footnote">No streaks. No countdown. Your progress waits for you.</p>
+    </section>
+
     <header class="site-header">
       <a class="brand" href="#" aria-label="Focus Physics home">
         <span class="brand-mark" aria-hidden="true">ƒ</span>
         <span>Focus Physics</span>
       </a>
       <div class="header-actions">
+        <button class="ghost-button" id="topicButton" type="button">Change topic</button>
         <button class="ghost-button" id="pauseButton" type="button">Pause &amp; save</button>
       </div>
     </header>

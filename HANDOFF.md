@@ -1,6 +1,6 @@
 # Focus Physics 项目交接
 
-交接日期：2026-10-09
+交接日期：2026-10-10
 
 ## 1. 项目概览
 
@@ -8,9 +8,9 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 - 线上地址：https://focus-physics-demo.meixi-guo.chatgpt.site
 - Sites Project ID：`appgprj_6ac8dfb9968c8191935ce885b1f97dc6`
-- 当前线上访问模式：private/custom，请保持现有受众设置，除非项目所有者明确要求公开。
+- 当前线上访问模式：public，请保持现有受众设置，除非项目所有者明确要求修改。
 - 本地项目目录：`/Users/guomeixi/Documents/Codex/2026-10-07/ban/work/sites/focus-physics`
-- 当前已发布源码提交：`8f24f0b0f598981b5ed7806dcd562cae83fecb5d`
+- 当前已发布源码提交：发布后以 `git log -1 --format=%H` 和 Sites 最新版本为准。
 - 技术栈：无构建步骤的静态 HTML/CSS/JavaScript。
 
 ## 2. 主要文件
@@ -33,6 +33,7 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 
 ### ADHD 友好设计
 
+- 首屏是低饱和像素风 topic world 选择页；目前 `Forces` 是唯一完整可玩的 demo，其余主题明确标记为 next world，不伪装成已完成内容。
 - 每屏只要求一个动作，并显示 `PREDICT / CHOOSE / CALCULATE / CHECK`。
 - 长题干拆成 `GIVEN / FORCES / FIND`，数量、单位和 command words 分层高亮。
 - 左侧 `Reasoning so far` 始终保留已经验证的推理步骤，刷新或中断后可恢复当前进度。
@@ -44,38 +45,34 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - 正确与错误反馈使用轻量 Gen Alpha 语气，例如 `Big W`、`caught in 4K`，但每条都紧跟准确物理解释，不能嘲笑学生。
 - 页面支持移动端，并遵守 `prefers-reduced-motion`。
 
+### 即时奖励伙伴
+
+- 首次进入完整课时前选择 Einstein、Cat 或 Dog；选择保存在 `focusPhysicsCompanion`。
+- Einstein：正确时眨眼、错误时吐舌头；Cat 和 Dog 使用互换的 meow/woof 反应。
+- 伙伴位于右栏 Scratchpad 上方，并保留 `Change buddy`。
+- 默认不自动播放声音；奖励通过短动画、气泡文字和 `aria-live` 提供。
+
 ### 浏览器本地状态
 
 - `focusPhysicsStep`：当前步骤编号。
 - `focusPhysicsNotes`：Scratchpad 内容。
+- `focusPhysicsCompanion`：当前伙伴。
 
 如果改变状态结构，请考虑旧值兼容或提供安全回退。
 
-## 4. 尚未实现的最新需求：即时奖励伙伴
+## 4. 下一优先级：真正接入 AI
 
-这是下一位开发者最优先的任务。本次交接前还没有写入任何伙伴相关代码。
+比赛要求 AI 在产品中执行有用工作；编码时使用 AI 工具本身不算产品功能。当前静态 demo 尚未调用模型 API。
 
-用户希望针对 ADHD 多巴胺动力不足，增加一个位于学习区旁边的即时奖励伙伴。要求：
+建议只做一个可靠的核心能力：`misconception-aware hint`。
 
-- 首次进入页面时提供 3 个选择，并让学生选择一个伙伴。
-- 插画风格、低饱和，不使用过多鲜艳颜色，也不要成为新的干扰源。
-- 爱因斯坦：答对时眨眼；答错时吐舌头。
-- 猫：答对显示/发出 `Meow!`；答错显示/发出 `Woof!`。
-- 狗：答对显示/发出 `Woof!`；答错显示/发出 `Meow!`。
-- 奖励必须在点击检查答案后立即出现。
+1. 浏览器把 topic、题干、当前步骤、学生答案、已经验证的 reasoning trail 和所选帮助类型发送到 `/api/hint`。
+2. 服务端 Worker 从环境变量读取 API key，再调用模型；绝对不要把 key 写进 `dist/app.js`。
+3. 模型返回短 JSON：`hint`、`why`、`next_action`。第一次提示不直接给最终答案；保持物理准确、非羞辱、每次只给一个动作。
+4. 后端验证字段、长度和允许的步骤，并设置超时/速率限制。
+5. API 失败时退回现有静态 `steps[currentStep].help`，保证评委仍能完整操作。
 
-建议实现方式：
-
-1. 在右侧 Scratchpad 上方增加独立的 `Reward buddy` 卡片，不遮挡题目和 `I’m stuck!`。
-2. 使用内联 SVG 绘制爱因斯坦、猫和狗，颜色以灰蓝、米色、低饱和紫和鼠尾草绿为主。
-3. 首次访问时使用 `<dialog>` 显示三个选择卡；将选择保存到新的 `localStorage` 键，例如 `focusPhysicsCompanion`。
-4. 卡片保留 `Change buddy`，避免选错后无法更换。
-5. 在 `checkButton` 的正确/错误分支调用统一函数，例如 `reactCompanion(isCorrect)`。
-6. 爱因斯坦的眨眼和吐舌头可以通过 SVG class + CSS keyframes 完成；猫狗用轻微弹跳和短气泡文字即可。
-7. 默认不要自动播放响亮音频。优先显示 `Meow!` / `Woof!` 气泡并使用 `aria-live`；如果以后加入声音，应提供明确的静音控制。
-8. 在 `prefers-reduced-motion: reduce` 下关闭弹跳、晃动和眨眼动画，但仍显示对应静态反应。
-
-不要把伙伴反应接到 `I’m stuck!` 帮助按钮上；它只应响应正式答案检查。
+开局页的其他 topic world 暂时只作未来方向展示。若来得及扩展，应优先增加一条完整的 Energy 或 Waves 路径；不要让 AI 即兴生成未经验证的物理答案。
 
 ## 5. 代码入口提示
 
@@ -83,8 +80,8 @@ Focus Physics 是一个面向 ADHD/注意力波动学生的 GCSE Physics 微步�
 - 正确/错误判断位于 `check.addEventListener("click", ...)`。
 - 页面切换与状态重置位于 `renderStep()` 和 `hideFeedback()`。
 - `Reasoning so far` 由 `updateReasoningTrail()` 生成。
-- 页面右侧当前只有 Scratchpad；适合在 `dist/index.html` 中为其增加一个外层 right rail，再把伙伴卡放在 Scratchpad 上方。
-- 现有三栏布局位于 `.app-shell`；在 `1120px` 和 `780px` 两个媒体查询中要同步检查伙伴卡布局。
+- 开局页结构在 `dist/index.html` 的 `#topicGate`；显示/隐藏逻辑位于 `setTopicGate()`。
+- 现有三栏布局位于 `.app-shell`；在 `1120px`、`780px` 和 `520px` 媒体查询中同步检查。
 
 ## 6. 本地运行与检查
 
@@ -122,7 +119,7 @@ git status --short
 1. 保持 `.openai/hosting.json` 的项目 ID 不变。
 2. 使用对应账号获取该 Sites 项目的源码写入凭据。
 3. 将本地源码推送并打包成包含 `.openai/hosting.json` 与 `dist/` 的部署 archive。
-4. 使用当前完整 commit SHA 保存新版本，并以 private 模式部署。
+4. 使用当前完整 commit SHA 保存新版本，并保持 public 受众部署。
 5. 部署成功后打开线上地址检查。不要在文档或 Git 中保存任何临时凭据。
 
 如果接手者没有 Sites 发布权限，可以先完成本地修改和测试，再由项目所有者执行最终发布。
